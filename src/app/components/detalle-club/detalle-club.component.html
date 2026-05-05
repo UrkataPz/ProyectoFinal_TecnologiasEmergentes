@@ -1,0 +1,38 @@
+<section class="page">
+  @if (club) {
+    <div class="card detail-card">
+      <span class="badge">{{ club.categoria }}</span>
+      <h1>{{ club.nombre }}</h1>
+      <p>{{ club.descripcion }}</p>
+
+      <div class="grid grid-2 info-grid">
+        <div>
+          <h2>Objetivo</h2>
+          <p>{{ club.objetivo }}</p>
+        </div>
+        <div>
+          <h2>Directiva</h2>
+          <p>{{ club.directiva }}</p>
+        </div>
+      </div>
+
+      <h2>Eventos próximos</h2>
+      <ul class="event-list">
+        @for (evento of club.eventos; track evento) {
+          <li>{{ evento }}</li>
+        }
+      </ul>
+
+      <div class="actions">
+        <a class="btn btn-blue" routerLink="/registro">Solicitar ingreso</a>
+        <a class="btn btn-light" routerLink="/clubes">Volver al directorio</a>
+      </div>
+    </div>
+  } @else {
+    <div class="card">
+      <h1>Club no encontrado</h1>
+      <p>No se encontró información para el club seleccionado.</p>
+      <a class="btn btn-blue" routerLink="/clubes">Volver al directorio</a>
+    </div>
+  }
+</section>

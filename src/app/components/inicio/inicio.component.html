@@ -1,0 +1,48 @@
+<section class="page">
+  <div class="hero">
+    <div>
+      <span class="badge">Avance 2 - Esqueleto funcional</span>
+      <h1>Sistema de Gestión de Clubes y Organizaciones Estudiantiles</h1>
+      <p>
+        Plataforma web para centralizar la información de clubes universitarios,
+        mejorar la visibilidad de sus actividades y facilitar la participación de estudiantes.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" routerLink="/clubes">Ver clubes</a>
+        <a class="btn btn-secondary" routerLink="/registro">Crear cuenta</a>
+      </div>
+    </div>
+
+    <aside class="hero-card">
+      <strong>CEUTEC</strong>
+      <p>Solución académica desarrollada en Angular con rutas, componentes base y navegación funcional.</p>
+    </aside>
+  </div>
+
+  <div class="grid grid-3 stats">
+    @for (item of resumenes; track item.titulo) {
+      <article class="card">
+        <span class="badge">{{ item.valor }}</span>
+        <h3>{{ item.titulo }}</h3>
+        <p>{{ item.texto }}</p>
+      </article>
+    }
+  </div>
+
+  <div class="grid grid-2 mt">
+    <article class="card">
+      <h2>Problema identificado</h2>
+      <p>
+        Muchos estudiantes no conocen qué clubes existen, quiénes los integran,
+        qué eventos realizan o cómo pueden formar parte de ellos.
+      </p>
+    </article>
+    <article class="card">
+      <h2>Objetivo del sistema</h2>
+      <p>
+        Crear una base funcional para una aplicación web que permita consultar clubes,
+        navegar entre secciones y preparar el desarrollo de futuras funciones.
+      </p>
+    </article>
+  </div>
+</section>

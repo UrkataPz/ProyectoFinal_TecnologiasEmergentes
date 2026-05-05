@@ -1,0 +1,24 @@
+<section class="page">
+  <div class="section-title">
+    <span class="badge">Directorio</span>
+    <h1>Clubes estudiantiles</h1>
+    <p>Listado inicial de clubes disponibles dentro de la plataforma.</p>
+  </div>
+
+  <div class="grid grid-2 club-list">
+    @for (club of clubes; track club.id) {
+      <article class="card club-card">
+        <div class="topline">
+          <span class="badge">{{ club.categoria }}</span>
+          <span class="members">{{ club.miembros }} miembros</span>
+        </div>
+        <h2>{{ club.nombre }}</h2>
+        <p>{{ club.descripcion }}</p>
+        <div class="actions">
+          <a class="btn btn-blue" [routerLink]="['/clubes', club.id]">Ver detalle</a>
+          <a class="btn btn-light" routerLink="/registro">Solicitar ingreso</a>
+        </div>
+      </article>
+    }
+  </div>
+</section>

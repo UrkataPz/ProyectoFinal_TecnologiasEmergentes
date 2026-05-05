@@ -1,0 +1,54 @@
+<section class="page">
+  <div class="section-title">
+    <span class="badge">Panel interno</span>
+    <h1>Panel de usuario</h1>
+    <p>Vista base para mostrar solicitudes, clubes relacionados y anuncios internos.</p>
+  </div>
+
+  <div class="grid grid-3 dashboard-cards">
+    <article class="card metric">
+      <span>2</span>
+      <h3>Clubes relacionados</h3>
+      <p>Clubes donde el usuario participa o ha solicitado ingreso.</p>
+    </article>
+    <article class="card metric">
+      <span>3</span>
+      <h3>Solicitudes</h3>
+      <p>Solicitudes de ingreso registradas en la maqueta.</p>
+    </article>
+    <article class="card metric">
+      <span>5</span>
+      <h3>Eventos</h3>
+      <p>Actividades próximas de clubes estudiantiles.</p>
+    </article>
+  </div>
+
+  <div class="grid grid-2 mt">
+    <article class="card">
+      <h2>Mis solicitudes</h2>
+      <div class="table-like">
+        <div class="row header">
+          <span>Club</span>
+          <span>Estado</span>
+          <span>Fecha</span>
+        </div>
+        @for (solicitud of solicitudes; track solicitud.club) {
+          <div class="row">
+            <span>{{ solicitud.club }}</span>
+            <span>{{ solicitud.estado }}</span>
+            <span>{{ solicitud.fecha }}</span>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>Anuncios internos</h2>
+      <ul class="announcement-list">
+        @for (anuncio of anuncios; track anuncio) {
+          <li>{{ anuncio }}</li>
+        }
+      </ul>
+    </article>
+  </div>
+</section>

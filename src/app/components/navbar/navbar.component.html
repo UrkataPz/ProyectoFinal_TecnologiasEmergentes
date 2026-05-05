@@ -1,0 +1,17 @@
+<header class="navbar">
+  <a class="brand" routerLink="/" aria-label="Ir al inicio">
+    <span class="brand-icon">CE</span>
+    <span>
+      <strong>Clubes CEUTEC</strong>
+      <small>Organizaciones estudiantiles</small>
+    </span>
+  </a>
+
+  <nav class="nav-links" aria-label="Navegación principal">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+    <a routerLink="/clubes" routerLinkActive="active">Clubes</a>
+    <a routerLink="/panel-usuario" routerLinkActive="active">Panel</a>
+    <a routerLink="/login" routerLinkActive="active">Login</a>
+    <a class="register" routerLink="/registro" routerLinkActive="active">Registro</a>
+  </nav>
+</header>

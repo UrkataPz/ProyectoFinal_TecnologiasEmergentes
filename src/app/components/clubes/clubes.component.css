@@ -1,0 +1,5 @@
+.club-list { margin-top: 22px; }
+.topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.members { color: #667085; font-weight: 700; font-size: 0.9rem; }
+.club-card h2 { margin-bottom: 8px; }
+.actions { margin-top: 16px; }

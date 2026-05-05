@@ -1,0 +1,5 @@
+.detail-card h1 { font-size: clamp(2rem, 4vw, 3rem); margin: 12px 0; }
+.info-grid { margin: 24px 0; }
+.event-list { display: grid; gap: 10px; padding-left: 18px; }
+.event-list li { color: #344054; line-height: 1.5; }
+.actions { margin-top: 24px; }
