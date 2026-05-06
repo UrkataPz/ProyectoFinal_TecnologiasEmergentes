@@ -2,7 +2,47 @@
   <div class="section-title">
     <span class="badge">Panel interno</span>
     <h1>Panel de usuario</h1>
-    <p>Vista base para mostrar solicitudes, clubes relacionados y anuncios internos.</p>
+    <p>Vista base para mostrar solicitudes, clubes relacionados, anuncios internos y modificación de información del usuario.</p>
+  </div>
+
+
+  <div class="grid grid-2 mb" style="margin-bottom: 2rem; gap: 20px;">
+
+    <article class="card" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 2rem;">
+      <div class="profile-circle" style="width: 120px; height: 120px; border-radius: 50%; background: #e0e0e0; margin-bottom: 1rem; overflow: hidden; border: 3px solid #007bff;">
+        <img src="" alt="Foto de perfil" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <h2 style="margin: 0;">usuario.nombre</h2>
+      <span class="badge" style="margin-top: 0.5rem;">rol</span>
+      <div style="margin-top: 1.5rem; text-align: left; width: 100%;">
+        <p><strong>Correo:</strong> correo </p>
+        <p><strong>Carrera:</strong> carrera </p>
+      </div>
+    </article>
+
+    <article class="card" style="padding: 2rem;">
+      <h2>Modificar Información</h2>
+      <p>Actualiza tus datos personales a continuación:</p>
+      <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 1rem;">
+        <div class="form-group">
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre Completo:</label>
+          <input type="text"  style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+        <div class="form-group">
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Correo Institucional:</label>
+          <input type="email"  style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+        <div class="form-group">
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Carrera:</label>
+          <input type="text"  style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+        <div style="margin-top: 10px;">
+          <button type="button" class="btn-primary" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Guardar Cambios
+          </button>
+        </div>
+      </div>
+    </article>
   </div>
 
   <div class="grid grid-3 dashboard-cards">
@@ -19,7 +59,7 @@
     <article class="card metric">
       <span>5</span>
       <h3>Eventos</h3>
-      <p>Actividades próximas de clubes estudiantiles.</p>
+      <p>Actividades próximas de clubes estudiantiles.</p>  
     </article>
   </div>
 
