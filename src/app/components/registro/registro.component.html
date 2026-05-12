@@ -1,39 +1,109 @@
 <section class="page">
   <div class="section-title center">
-    <span class="badge">Nuevo usuario</span>
+    <span class="badge">Crear cuenta</span>
     <h1>Registro</h1>
-    <p>Formulario base para que los estudiantes puedan crear una cuenta dentro del sistema.</p>
+    <p>Únete a la plataforma de clubes estudiantiles de CEUTEC.</p>
   </div>
 
   <form class="card form-card" (ngSubmit)="registrar()">
     <div class="form-group">
       <label for="nombre">Nombre completo</label>
-      <input id="nombre" name="nombre" type="text" [(ngModel)]="usuario.nombre" placeholder="Nombre del estudiante" required>
+      <input
+        id="nombre"
+        type="text"
+        name="nombre"
+        placeholder="Tu nombre completo"
+        [value]="nombre()"
+        (input)="nombre.set($any($event.target).value)"
+        required>
     </div>
 
     <div class="form-group">
       <label for="correo">Correo institucional</label>
-      <input id="correo" name="correo" type="email" [(ngModel)]="usuario.correo" placeholder="correo@unitec.edu" required>
+      <input
+        id="correo"
+        type="email"
+        name="correo"
+        placeholder="correo@unitec.edu"
+        [value]="correo()"
+        (input)="correo.set($any($event.target).value)"
+        required>
     </div>
 
     <div class="form-group">
       <label for="carrera">Carrera</label>
-      <input id="carrera" name="carrera" type="text" [(ngModel)]="usuario.carrera" placeholder="Ej. Ingeniería Informática">
-    </div>
-
-    <div class="form-group">
-      <label for="rol">Rol inicial</label>
-      <select id="rol" name="rol" [(ngModel)]="usuario.rol">
-        <option>Estudiante</option>
-        <option>Miembro de club</option>
-        <option>Directivo</option>
+      <select id="carrera" name="carrera"
+              [value]="carrera()"
+              (change)="carrera.set($any($event.target).value)"
+              required>
+        <option value="">Selecciona tu carrera</option>
+        <option value="Ingeniería de Software">Ingeniería de Software</option>
+        <option value="Administración">Administración</option>
+        <option value="Diseño Gráfico">Diseño Gráfico</option>
+        <option value="Marketing">Marketing</option>
+        <option value="Contaduría Pública">Contaduría Pública</option>
+        <option value="Ingeniería Industrial">Ingeniería Industrial</option>
       </select>
     </div>
 
-    <button class="btn btn-blue" type="submit">Registrarme</button>
+    <div class="form-group">
+      <label for="rol">Rol</label>
+      <select id="rol" name="rol"
+              [value]="rol()"
+              (change)="rol.set($any($event.target).value)">
+        <option value="Estudiante">Estudiante</option>
+        <option value="Docente">Docente</option>
+        <option value="Administrador">Administrador</option>
+      </select>
+    </div>
 
-    @if (mensaje) {
-      <p class="notice">{{ mensaje }}</p>
+    <div class="form-group">
+      <label for="password">Contraseña</label>
+      <input
+        id="password"
+        type="password"
+        name="password"
+        placeholder="Mínimo 6 caracteres"
+        [value]="password()"
+        (input)="password.set($any($event.target).value)"
+        required>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirmar contraseña</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        name="confirmPassword"
+        placeholder="Repite tu contraseña"
+        [value]="confirmPassword()"
+        (input)="confirmPassword.set($any($event.target).value)"
+        required>
+
+      @if (confirmPassword() && !passwordsCoinciden()) {
+        <small class="field-error">Las contraseñas no coinciden</small>
+      }
+    </div>
+
+    <button class="btn btn-blue" type="submit" [disabled]="isLoading()">
+      @if (isLoading()) {
+        <span class="spinner"></span>
+        Creando cuenta...
+      } @else {
+        Crear cuenta
+      }
+    </button>
+
+    <p class="login-link">
+      ¿Ya tienes una cuenta? <a routerLink="/login">Inicia sesión</a>
+    </p>
+
+    @if (mensaje()) {
+      <p class="notice"
+         [class.notice-success]="mensaje().startsWith('✅')"
+         [class.notice-error]="mensaje().startsWith('❌')">
+        {{ mensaje() }}
+      </p>
     }
   </form>
 </section>

@@ -1,15 +1,10 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-
-interface ClubDetalle {
-  id: number;
-  nombre: string;
-  categoria: string;
-  descripcion: string;
-  objetivo: string;
-  directiva: string;
-  eventos: string[];
-}
+import { Component, inject, input, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { switchMap, of } from 'rxjs';
+import { ClubesService } from '../../services/clubes.service';
+import { SolicitudesService } from '../../services/solicitudes.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-detalle-club',
@@ -19,49 +14,51 @@ interface ClubDetalle {
   styleUrl: './detalle-club.component.css'
 })
 export class DetalleClubComponent {
-  private route = inject(ActivatedRoute);
+  // withComponentInputBinding() mapea el param :id de la ruta a este input()
+  id = input<string>('');
 
-  clubes: ClubDetalle[] = [
-    {
-      id: 1,
-      nombre: 'Club de Tecnología e Innovación',
-      categoria: 'Tecnología',
-      descripcion: 'Espacio para estudiantes interesados en programación, innovación y proyectos tecnológicos.',
-      objetivo: 'Promover el desarrollo de habilidades tecnológicas mediante talleres, retos y proyectos colaborativos.',
-      directiva: 'Coordinador tecnológico y equipo de estudiantes líderes.',
-      eventos: ['Taller de Angular', 'Charla sobre Firebase', 'Hackatón universitaria']
-    },
-    {
-      id: 2,
-      nombre: 'Club de Emprendimiento',
-      categoria: 'Negocios',
-      descripcion: 'Organización orientada a ideas de negocio, liderazgo y desarrollo de proyectos estudiantiles.',
-      objetivo: 'Impulsar la creatividad, liderazgo y validación de ideas de negocio dentro de la comunidad estudiantil.',
-      directiva: 'Presidente, secretario y equipo de logística.',
-      eventos: ['Pitch de ideas', 'Feria de emprendimiento', 'Mentoría de negocios']
-    },
-    {
-      id: 3,
-      nombre: 'Club de Voluntariado',
-      categoria: 'Social',
-      descripcion: 'Grupo enfocado en actividades de apoyo social, servicio comunitario y participación universitaria.',
-      objetivo: 'Organizar actividades de impacto social y promover la participación responsable de los estudiantes.',
-      directiva: 'Coordinador social y voluntarios líderes.',
-      eventos: ['Campaña solidaria', 'Jornada de recolección', 'Actividad comunitaria']
-    },
-    {
-      id: 4,
-      nombre: 'Club de Arte y Cultura',
-      categoria: 'Cultura',
-      descripcion: 'Comunidad para promover actividades artísticas, culturales y creativas dentro de la universidad.',
-      objetivo: 'Crear espacios de expresión artística y cultural para la comunidad universitaria.',
-      directiva: 'Coordinador cultural y equipo creativo.',
-      eventos: ['Exposición artística', 'Noche cultural', 'Taller de fotografía']
+  private clubesService = inject(ClubesService);
+  private solicitudesService = inject(SolicitudesService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  // Reactivo: cada vez que cambia id(), hace nueva consulta a Firestore
+  readonly club = toSignal(
+    toObservable(this.id).pipe(
+      switchMap(id => id ? this.clubesService.getById(id) : of(undefined))
+    ),
+    { initialValue: undefined }
+  );
+
+  readonly mensajeAccion = signal('');
+  readonly enviando = signal(false);
+
+  async solicitar(): Promise<void> {
+    const user = this.authService.currentUser();
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
     }
-  ];
 
-  get club(): ClubDetalle | undefined {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    return this.clubes.find((club) => club.id === id);
+    const club = this.club();
+    if (!club) return;
+
+    this.enviando.set(true);
+    try {
+      await this.solicitudesService.create({
+        usuarioId: user.uid,
+        usuarioNombre: user.displayName ?? user.email ?? '',
+        usuarioEmail: user.email ?? '',
+        clubId: club.id!,
+        clubNombre: club.nombre,
+        estado: 'pendiente'
+      });
+      this.mensajeAccion.set('✅ Solicitud enviada correctamente');
+    } catch {
+      this.mensajeAccion.set('❌ Error al enviar la solicitud');
+    } finally {
+      this.enviando.set(false);
+      setTimeout(() => this.mensajeAccion.set(''), 4000);
+    }
   }
 }

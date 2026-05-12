@@ -10,8 +10,14 @@
   <nav class="nav-links" aria-label="Navegación principal">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
     <a routerLink="/clubes" routerLinkActive="active">Clubes</a>
-    <a routerLink="/panel-usuario" routerLinkActive="active">Panel</a>
-    <a routerLink="/login" routerLinkActive="active">Login</a>
-    <a class="register" routerLink="/registro" routerLinkActive="active">Registro</a>
+
+    @if (isLoggedIn()) {
+      <a routerLink="/panel-usuario" routerLinkActive="active">
+        {{ displayName() || 'Panel' }}
+      </a>
+    } @else {
+      <a routerLink="/login" routerLinkActive="active">Login</a>
+      <a class="register" routerLink="/registro" routerLinkActive="active">Registro</a>
+    }
   </nav>
 </header>

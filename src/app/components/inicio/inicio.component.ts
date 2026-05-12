@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -9,9 +9,15 @@ import { RouterLink } from '@angular/router';
   styleUrl: './inicio.component.css'
 })
 export class InicioComponent {
-  resumenes = [
-    { titulo: 'Clubes registrados', valor: '6+', texto: 'Directorio inicial de organizaciones estudiantiles.' },
-    { titulo: 'Eventos activos', valor: '12', texto: 'Actividades, reuniones y anuncios por club.' },
-    { titulo: 'Roles del sistema', valor: '4', texto: 'Administrador, directivo, miembro y estudiante.' }
-  ];
+  readonly resumenes = signal([
+    { titulo: 'Clubes registrados', valor: '6+', texto: 'Directorio de organizaciones estudiantiles activas.' },
+    { titulo: 'Categorías',         valor: '7',  texto: 'Tecnología, deportes, cultura, arte y más.' },
+    { titulo: 'Estudiantes',        valor: '∞',  texto: 'Cualquier estudiante puede solicitar su ingreso.' }
+  ]);
+
+  readonly pasos = signal([
+    { num: '1', titulo: 'Crea tu cuenta',       desc: 'Regístrate con tu correo institucional.' },
+    { num: '2', titulo: 'Explora los clubes',   desc: 'Navega el directorio y conoce cada organización.' },
+    { num: '3', titulo: 'Solicita tu ingreso',  desc: 'Envía una solicitud y espera la aprobación.' }
+  ]);
 }

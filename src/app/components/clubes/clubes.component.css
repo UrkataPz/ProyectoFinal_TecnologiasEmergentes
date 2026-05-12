@@ -3,3 +3,4 @@
 .members { color: #667085; font-weight: 700; font-size: 0.9rem; }
 .club-card h2 { margin-bottom: 8px; }
 .actions { margin-top: 16px; }
+.empty-state { text-align: center; padding: 48px 0; }

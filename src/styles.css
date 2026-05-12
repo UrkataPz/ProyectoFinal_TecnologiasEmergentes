@@ -133,6 +133,69 @@ input, select, textarea {
 }
 .row.header { font-weight: 800; background: var(--secondary); color: var(--primary); }
 
+.notice {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--secondary);
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 12px;
+}
+.notice-success { background: #dcfce7; color: var(--success); }
+.notice-error   { background: #fee2e2; color: var(--danger); }
+
+.login-link { text-align: center; color: var(--muted); margin-top: 8px; }
+.login-link a { color: var(--primary); font-weight: 700; }
+
+.field-error { color: var(--danger); font-size: 0.82rem; }
+
+.center { text-align: center; }
+.mt { margin-top: 32px; }
+
+.section-title.center h1,
+.section-title.center p { text-align: center; }
+
+.search-bar { margin-bottom: 20px; }
+.search-bar input { max-width: 420px; }
+
+.empty-state { text-align: center; padding: 32px; color: var(--muted); }
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.paso-card { text-align: center; }
+.paso-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.detail-header { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.detail-card { max-width: 860px; margin: 0 auto; }
+.descripcion { font-size: 1.05rem; color: var(--muted); line-height: 1.7; }
+.info-grid { margin: 24px 0; }
+.stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 20px; }
+.stat { color: var(--muted); font-size: 0.95rem; }
+.stat strong { color: var(--text); font-size: 1.4rem; margin-right: 4px; }
+
+.badge-inactive { background: #fee2e2; color: var(--danger); }
+
 @media (max-width: 820px) {
   .hero { grid-template-columns: 1fr; padding: 28px; }
   .grid-3, .grid-2 { grid-template-columns: 1fr; }
