@@ -1,0 +1,24 @@
+<article class="card club-card">
+  <div class="topline">
+    <span class="badge">{{ club().categoria }}</span>
+    <span class="members">{{ club().miembros }} miembros</span>
+  </div>
+
+  <h2>{{ club().nombre }}</h2>
+  <p>{{ club().descripcion }}</p>
+
+  @if (!club().activo) {
+    <span class="badge badge-inactive">Inactivo</span>
+  }
+
+  @if (mostrarAcciones()) {
+    <div class="actions">
+      <button class="btn btn-blue" (click)="verDetalle.emit(club().id!)">
+        Ver detalle
+      </button>
+      <button class="btn btn-light" (click)="solicitarIngreso.emit(club())">
+        Solicitar ingreso
+      </button>
+    </div>
+  }
+</article>

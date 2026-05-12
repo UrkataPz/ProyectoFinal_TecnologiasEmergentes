@@ -1,26 +1,56 @@
 <section class="page">
   <div class="section-title center">
     <span class="badge">Acceso al sistema</span>
-    <h1>Login</h1>
-    <p>Vista base para el inicio de sesión de estudiantes, directivos y administradores.</p>
+    <h1>Iniciar sesión</h1>
+    <p>Ingresa con tu correo institucional para acceder a los clubes universitarios.</p>
   </div>
 
   <form class="card form-card" (ngSubmit)="iniciarSesion()">
     <div class="form-group">
       <label for="correo">Correo institucional</label>
-      <input id="correo" name="correo" type="email" placeholder="ejemplo@unitec.edu" [(ngModel)]="correo" required>
+      <input
+        id="correo"
+        name="correo"
+        type="email"
+        placeholder="ejemplo@unitec.edu"
+        [value]="correo()"
+        (input)="correo.set($any($event.target).value)"
+        [disabled]="isLoading()"
+        required>
     </div>
 
     <div class="form-group">
       <label for="password">Contraseña</label>
-      <input id="password" name="password" type="password" placeholder="Ingrese su contraseña" [(ngModel)]="password" required>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        placeholder="Ingresa tu contraseña"
+        [value]="password()"
+        (input)="password.set($any($event.target).value)"
+        [disabled]="isLoading()"
+        required>
     </div>
 
-    <button class="btn btn-blue" type="submit">Ingresar</button>
-    <a class="btn btn-light" routerLink="/registro">Crear cuenta</a>
+    <button class="btn btn-blue" type="submit" [disabled]="isLoading()">
+      @if (isLoading()) {
+        <span class="spinner"></span>
+        Verificando...
+      } @else {
+        Ingresar
+      }
+    </button>
 
-    @if (mensaje) {
-      <p class="notice">{{ mensaje }}</p>
+    <a class="btn btn-light" routerLink="/registro">
+      Crear cuenta nueva
+    </a>
+
+    @if (mensaje()) {
+      <p class="notice"
+         [class.notice-success]="mensaje().startsWith('✅')"
+         [class.notice-error]="mensaje().startsWith('❌')">
+        {{ mensaje() }}
+      </p>
     }
   </form>
 </section>

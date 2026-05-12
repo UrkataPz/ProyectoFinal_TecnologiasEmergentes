@@ -1,11 +1,12 @@
 <section class="page">
+  <!-- Hero -->
   <div class="hero">
     <div>
-      <span class="badge">Avance 2 - Esqueleto funcional</span>
-      <h1>Sistema de Gestión de Clubes y Organizaciones Estudiantiles</h1>
+      <span class="badge">Plataforma universitaria</span>
+      <h1>Descubre los clubes de CEUTEC</h1>
       <p>
-        Plataforma web para centralizar la información de clubes universitarios,
-        mejorar la visibilidad de sus actividades y facilitar la participación de estudiantes.
+        Consulta las organizaciones estudiantiles disponibles, conoce sus objetivos
+        y solicita tu ingreso desde un solo lugar.
       </p>
       <div class="actions">
         <a class="btn btn-primary" routerLink="/clubes">Ver clubes</a>
@@ -15,12 +16,13 @@
 
     <aside class="hero-card">
       <strong>CEUTEC</strong>
-      <p>Solución académica desarrollada en Angular con rutas, componentes base y navegación funcional.</p>
+      <p>Plataforma de gestión de clubes y organizaciones estudiantiles universitarias.</p>
     </aside>
   </div>
 
+  <!-- Stats -->
   <div class="grid grid-3 stats">
-    @for (item of resumenes; track item.titulo) {
+    @for (item of resumenes(); track item.titulo) {
       <article class="card">
         <span class="badge">{{ item.valor }}</span>
         <h3>{{ item.titulo }}</h3>
@@ -29,20 +31,37 @@
     }
   </div>
 
+  <!-- Cómo funciona -->
+  <div class="section-title mt">
+    <h2>¿Cómo funciona?</h2>
+  </div>
+
+  <div class="grid grid-3">
+    @for (paso of pasos(); track paso.num) {
+      <article class="card paso-card">
+        <span class="paso-num">{{ paso.num }}</span>
+        <h3>{{ paso.titulo }}</h3>
+        <p>{{ paso.desc }}</p>
+      </article>
+    }
+  </div>
+
+  <!-- CTA -->
   <div class="grid grid-2 mt">
     <article class="card">
       <h2>Problema identificado</h2>
       <p>
-        Muchos estudiantes no conocen qué clubes existen, quiénes los integran,
-        qué eventos realizan o cómo pueden formar parte de ellos.
+        Muchos estudiantes no conocen qué clubes existen, quiénes los integran
+        ni cómo pueden formar parte de ellos.
       </p>
     </article>
-    <article class="card">
-      <h2>Objetivo del sistema</h2>
-      <p>
-        Crear una base funcional para una aplicación web que permita consultar clubes,
-        navegar entre secciones y preparar el desarrollo de futuras funciones.
-      </p>
+    <article class="card cta-card">
+      <h2>¿Listo para unirte?</h2>
+      <p>Crea tu cuenta gratis y empieza a explorar los clubes disponibles.</p>
+      <div class="actions">
+        <a class="btn btn-blue" routerLink="/registro">Registrarse</a>
+        <a class="btn btn-light" routerLink="/login">Iniciar sesión</a>
+      </div>
     </article>
   </div>
 </section>

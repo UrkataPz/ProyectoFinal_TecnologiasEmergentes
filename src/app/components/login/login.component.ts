@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -10,11 +11,38 @@ import { RouterLink } from '@angular/router';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  correo = '';
-  password = '';
-  mensaje = '';
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  iniciarSesion(): void {
-    this.mensaje = 'Maqueta funcional: el inicio de sesión se conectará a autenticación en futuros avances.';
+  correo = signal('');
+  password = signal('');
+  mensaje = signal('');
+  isLoading = signal(false);
+
+  async iniciarSesion(): Promise<void> {
+    if (!this.correo() || !this.password()) {
+      this.mensaje.set('❌ Por favor complete todos los campos');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.correo())) {
+      this.mensaje.set('❌ Ingrese un correo electrónico válido');
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.mensaje.set('🔄 Verificando credenciales...');
+
+    const result = await this.authService.login(this.correo(), this.password());
+
+    if (result.success) {
+      this.mensaje.set('✅ ' + result.message + '. Redirigiendo...');
+      setTimeout(() => this.router.navigate(['/panel-usuario']), 1500);
+    } else {
+      this.mensaje.set('❌ ' + result.message);
+      this.isLoading.set(false);
+      this.password.set('');
+    }
   }
 }

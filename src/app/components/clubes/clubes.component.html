@@ -1,24 +1,42 @@
 <section class="page">
   <div class="section-title">
-    <span class="badge">Directorio</span>
+    <span class="badge">{{ totalActivos() }} clubes activos</span>
     <h1>Clubes estudiantiles</h1>
-    <p>Listado inicial de clubes disponibles dentro de la plataforma.</p>
+    <p>Explora las organizaciones disponibles y solicita tu ingreso.</p>
   </div>
 
-  <div class="grid grid-2 club-list">
-    @for (club of clubes; track club.id) {
-      <article class="card club-card">
-        <div class="topline">
-          <span class="badge">{{ club.categoria }}</span>
-          <span class="members">{{ club.miembros }} miembros</span>
-        </div>
-        <h2>{{ club.nombre }}</h2>
-        <p>{{ club.descripcion }}</p>
-        <div class="actions">
-          <a class="btn btn-blue" [routerLink]="['/clubes', club.id]">Ver detalle</a>
-          <a class="btn btn-light" routerLink="/registro">Solicitar ingreso</a>
-        </div>
-      </article>
-    }
+  <div class="search-bar">
+    <input
+      type="search"
+      placeholder="Buscar por nombre o categoría..."
+      [value]="filtro()"
+      (input)="filtro.set($any($event.target).value)">
   </div>
+
+  @if (mensajeAccion()) {
+    <p class="notice"
+       [class.notice-success]="mensajeAccion().startsWith('✅')"
+       [class.notice-error]="mensajeAccion().startsWith('❌')">
+      {{ mensajeAccion() }}
+    </p>
+  }
+
+  @if (clubes().length === 0) {
+    <div class="card empty-state">
+      <p>Cargando clubes...</p>
+    </div>
+  } @else if (clubesFiltrados().length === 0) {
+    <div class="card empty-state">
+      <p>No se encontraron clubes con ese criterio.</p>
+    </div>
+  } @else {
+    <div class="grid grid-2 club-list">
+      @for (club of clubesFiltrados(); track club.id) {
+        <app-club-card
+          [club]="club"
+          (verDetalle)="irADetalle($event)"
+          (solicitarIngreso)="solicitar($event)" />
+      }
+    </div>
+  }
 </section>
