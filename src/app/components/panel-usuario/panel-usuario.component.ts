@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
@@ -7,8 +7,11 @@ import { switchMap, of } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { ClubesService } from '../../services/clubes.service';
 import { SolicitudesService } from '../../services/solicitudes.service';
+import { UserService } from './user.service';
 import { Club } from '../../models/club.model';
 import { EstadoSolicitud } from '../../models/solicitud.model';
+
+type PanelTab = 'solicitudes' | 'clubes' | 'admin-clubes' | 'admin-solicitudes';
 
 @Component({
   selector: 'app-panel-usuario',
@@ -21,15 +24,33 @@ export class PanelUsuarioComponent {
   readonly authService = inject(AuthService);
   private clubesService = inject(ClubesService);
   private solicitudesService = inject(SolicitudesService);
+  private userService = inject(UserService);
   private router = inject(Router);
 
   // ── Datos del usuario ──────────────────────────────────────────────────────
-  readonly nombre = computed(() => this.authService.displayName() || this.authService.email());
-  readonly esAdmin = computed(() => {
-    // Se considera admin si el displayName contiene "Admin" o por rol guardado
-    // La verificación real se haría con datos de Firestore; aquí usamos heurística
-    return false;
-  });
+  readonly perfil = toSignal(
+    toObservable(this.authService.uid).pipe(
+      switchMap(uid => uid ? this.userService.getProfile(uid) : of(undefined))
+    )
+  );
+
+  readonly nombre = computed(() => this.perfil()?.nombre || this.authService.displayName() || this.authService.email());
+  readonly inicialUsuario = computed(() => (this.nombre()?.trim().charAt(0) || 'U').toUpperCase());
+  readonly esAdmin = computed(() => this.perfil()?.rol === 'Admin');
+
+  readonly formPerfil = signal({ nombre: '', correo: '', carrera: '' });
+
+  constructor() {
+    // Sincronizar el formulario con los datos de Firestore cuando carguen
+    effect(() => {
+      const p = this.perfil();
+      this.formPerfil.set({
+        nombre: p?.nombre || this.authService.displayName() || '',
+        correo: p?.correo || this.authService.email() || '',
+        carrera: p?.carrera || ''
+      });
+    });
+  }
 
   // ── Solicitudes del usuario logueado ──────────────────────────────────────
   readonly misSolicitudes = toSignal(
@@ -58,7 +79,24 @@ export class PanelUsuarioComponent {
   );
 
   // ── Tabs del panel ────────────────────────────────────────────────────────
-  readonly tabActiva = signal<'solicitudes' | 'clubes' | 'admin-clubes' | 'admin-solicitudes'>('solicitudes');
+  readonly tabsPanel: { id: PanelTab; label: string }[] = [
+    { id: 'solicitudes', label: 'Mis solicitudes' },
+    { id: 'clubes', label: 'Directorio' },
+    { id: 'admin-clubes', label: 'Gestión de clubes' },
+    { id: 'admin-solicitudes', label: 'Todas las solicitudes' }
+  ];
+
+  tabActiva: PanelTab = 'solicitudes';
+
+  cambiarTab(tab: PanelTab, event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.tabActiva = tab;
+  }
+
+  esTabActiva(tab: PanelTab): boolean {
+    return this.tabActiva === tab;
+  }
 
   // ── Formulario de club ────────────────────────────────────────────────────
   readonly mostrarFormClub = signal(false);
@@ -123,6 +161,26 @@ export class PanelUsuarioComponent {
       this.editandoId.set(null);
     } catch {
       this.mensajePanel.set('❌ Error al guardar el club');
+    } finally {
+      this.cargando.set(false);
+      setTimeout(() => this.mensajePanel.set(''), 4000);
+    }
+  }
+
+  actualizarCampoPerfil(campo: string, valor: string): void {
+    this.formPerfil.update(p => ({ ...p, [campo]: valor }));
+  }
+
+  async guardarPerfil(): Promise<void> {
+    const uid = this.authService.uid();
+    if (!uid) return;
+
+    this.cargando.set(true);
+    try {
+      await this.userService.updateProfile(uid, this.formPerfil());
+      this.mensajePanel.set('✅ Perfil actualizado correctamente');
+    } catch {
+      this.mensajePanel.set('❌ Error al actualizar el perfil');
     } finally {
       this.cargando.set(false);
       setTimeout(() => this.mensajePanel.set(''), 4000);

@@ -18,14 +18,14 @@
   <div class="grid grid-2 mb" style="margin-bottom: 2rem; gap: 20px;">
 
     <article class="card" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 2rem;">
-      <div class="profile-circle" style="width: 120px; height: 120px; border-radius: 50%; background: #e0e0e0; margin-bottom: 1rem; overflow: hidden; border: 3px solid #007bff;">
-        <img src="" alt="Foto de perfil" style="width: 100%; height: 100%; object-fit: cover;">
+      <div class="profile-circle">
+        <span>{{ inicialUsuario() }}</span>
       </div>
-      <h2 style="margin: 0;">usuario.nombre</h2>
-      <span class="badge" style="margin-top: 0.5rem;">rol</span>
+      <h2 style="margin: 0;">{{ nombre() }}</h2>
+      <span class="badge" style="margin-top: 0.5rem;">{{ perfil()?.rol || 'Estudiante' }}</span>
       <div style="margin-top: 1.5rem; text-align: left; width: 100%;">
-        <p><strong>Correo:</strong> correo </p>
-        <p><strong>Carrera:</strong> carrera </p>
+        <p><strong>Correo:</strong> {{ perfil()?.correo || authService.email() }} </p>
+        <p><strong>Carrera:</strong> {{ perfil()?.carrera || 'No especificada' }} </p>
       </div>
     </article>
 
@@ -35,19 +35,26 @@
       <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 1rem;">
         <div class="form-group">
           <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre Completo:</label>
-          <input type="text"  style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+          <input type="text" [value]="formPerfil().nombre" 
+                 (input)="actualizarCampoPerfil('nombre', $any($event.target).value)"
+                 style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
         </div>
         <div class="form-group">
           <label style="display: block; margin-bottom: 5px; font-weight: bold;">Correo Institucional:</label>
-          <input type="email"  style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+          <input type="email" [value]="formPerfil().correo" 
+                 (input)="actualizarCampoPerfil('correo', $any($event.target).value)"
+                 style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
         </div>
         <div class="form-group">
           <label style="display: block; margin-bottom: 5px; font-weight: bold;">Carrera:</label>
-          <input type="text"  style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+          <input type="text" [value]="formPerfil().carrera" 
+                 (input)="actualizarCampoPerfil('carrera', $any($event.target).value)"
+                 style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
         </div>
         <div style="margin-top: 10px;">
-          <button type="button" class="btn-primary" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            Guardar Cambios
+          <button type="button" class="btn-primary" (click)="guardarPerfil()" [disabled]="cargando()"
+                  style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            {{ cargando() ? 'Guardando...' : 'Guardar Cambios' }}
           </button>
         </div>
       </div>
@@ -66,23 +73,27 @@
     </article>
     <article class="card metric">
       <strong>{{ solicitudesAprobadas() }}</strong>
-      <span>Clubes aprobados</span>
-      <span>5</span>
+      <span>Solicitudes aprobadas</span>
+    </article>
+    <article class="card metric">
+      <strong>5</strong>
       <h3>Eventos</h3>
       <p>Actividades próximas de clubes estudiantiles.</p>  
     </article>
   </div>
 
   <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab-btn" [class.active]="tabActiva() === 'solicitudes'"
-            (click)="tabActiva.set('solicitudes')">Mis solicitudes</button>
-    <button class="tab-btn" [class.active]="tabActiva() === 'clubes'"
-            (click)="tabActiva.set('clubes')">Directorio</button>
-    <button class="tab-btn" [class.active]="tabActiva() === 'admin-clubes'"
-            (click)="tabActiva.set('admin-clubes')">Gestión de clubes</button>
-    <button class="tab-btn" [class.active]="tabActiva() === 'admin-solicitudes'"
-            (click)="tabActiva.set('admin-solicitudes')">Todas las solicitudes</button>
+  <div class="tabs" role="tablist" aria-label="Secciones del panel">
+    @for (tab of tabsPanel; track tab.id) {
+      <button type="button"
+              role="tab"
+              class="tab-btn"
+              [class.active]="esTabActiva(tab.id)"
+              [attr.aria-selected]="esTabActiva(tab.id)"
+              (click)="cambiarTab(tab.id, $event)">
+        {{ tab.label }}
+      </button>
+    }
   </div>
 
   @if (mensajePanel()) {
@@ -94,7 +105,7 @@
   }
 
   <!-- Tab: Mis Solicitudes -->
-  @if (tabActiva() === 'solicitudes') {
+  @if (tabActiva === 'solicitudes') {
     <article class="card tab-content">
       <h2>Mis solicitudes de ingreso</h2>
 
@@ -133,7 +144,7 @@
   }
 
   <!-- Tab: Directorio de clubes -->
-  @if (tabActiva() === 'clubes') {
+  @if (tabActiva === 'clubes') {
     <article class="card tab-content">
       <h2>Clubes disponibles</h2>
       <div class="club-mini-list">
@@ -153,7 +164,7 @@
   }
 
   <!-- Tab: Gestión de Clubes (CRUD) -->
-  @if (tabActiva() === 'admin-clubes') {
+  @if (tabActiva === 'admin-clubes') {
     <article class="card tab-content">
       <div class="tab-title-row">
         <h2>Gestión de clubes</h2>
@@ -258,7 +269,7 @@
   }
 
   <!-- Tab: Todas las solicitudes (admin) -->
-  @if (tabActiva() === 'admin-solicitudes') {
+  @if (tabActiva === 'admin-solicitudes') {
     <article class="card tab-content">
       <h2>Gestión de solicitudes</h2>
 

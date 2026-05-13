@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject, runInInjectionContext } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -13,25 +13,34 @@ import {
   orderBy
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Solicitud } from '../models/solicitud.model';
 
 @Injectable({ providedIn: 'root' })
 export class SolicitudesService {
   private firestore = inject(Firestore);
+  private injector = inject(Injector);
   private colRef = collection(this.firestore, 'solicitudes');
 
   getAll(): Observable<Solicitud[]> {
     const q = query(this.colRef, orderBy('fechaSolicitud', 'desc'));
-    return collectionData(q, { idField: 'id' }) as Observable<Solicitud[]>;
+    return runInInjectionContext(
+      this.injector,
+      () => collectionData(q, { idField: 'id' }) as Observable<Solicitud[]>
+    );
   }
 
   getByUsuario(usuarioId: string): Observable<Solicitud[]> {
     const q = query(
       this.colRef,
-      where('usuarioId', '==', usuarioId),
-      orderBy('fechaSolicitud', 'desc')
+      where('usuarioId', '==', usuarioId)
     );
-    return collectionData(q, { idField: 'id' }) as Observable<Solicitud[]>;
+    return runInInjectionContext(
+      this.injector,
+      () => collectionData(q, { idField: 'id' }) as Observable<Solicitud[]>
+    ).pipe(
+      map(solicitudes => [...solicitudes].sort((a, b) => this.fechaMillis(b) - this.fechaMillis(a)))
+    );
   }
 
   async create(solicitud: Omit<Solicitud, 'id'>): Promise<void> {
@@ -44,5 +53,13 @@ export class SolicitudesService {
 
   async delete(id: string): Promise<void> {
     await deleteDoc(doc(this.firestore, 'solicitudes', id));
+  }
+
+  private fechaMillis(solicitud: Solicitud): number {
+    const fecha = solicitud.fechaSolicitud;
+    if (!fecha) return 0;
+    if (typeof fecha.toMillis === 'function') return fecha.toMillis();
+    if (fecha instanceof Date) return fecha.getTime();
+    return Number(fecha) || 0;
   }
 }
