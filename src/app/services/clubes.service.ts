@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject, runInInjectionContext } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -18,15 +18,22 @@ import { Club } from '../models/club.model';
 @Injectable({ providedIn: 'root' })
 export class ClubesService {
   private firestore = inject(Firestore);
+  private injector = inject(Injector);
   private colRef = collection(this.firestore, 'clubes');
 
   getAll(): Observable<Club[]> {
     const q = query(this.colRef, orderBy('nombre'));
-    return collectionData(q, { idField: 'id' }) as Observable<Club[]>;
+    return runInInjectionContext(
+      this.injector,
+      () => collectionData(q, { idField: 'id' }) as Observable<Club[]>
+    );
   }
 
   getById(id: string): Observable<Club | undefined> {
-    return docData(doc(this.firestore, 'clubes', id), { idField: 'id' }) as Observable<Club | undefined>;
+    return runInInjectionContext(
+      this.injector,
+      () => docData(doc(this.firestore, 'clubes', id), { idField: 'id' }) as Observable<Club | undefined>
+    );
   }
 
   async create(club: Omit<Club, 'id'>): Promise<void> {
