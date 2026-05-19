@@ -1,23 +1,38 @@
 <header class="navbar">
-  <a class="brand" routerLink="/" aria-label="Ir al inicio">
-    <span class="brand-icon">CE</span>
-    <span>
-      <strong>Clubes CEUTEC</strong>
-      <small>Organizaciones estudiantiles</small>
-    </span>
-  </a>
+  <!-- Marca + botón hamburguesa -->
+  <div class="navbar-top">
+    <a class="brand" routerLink="/" (click)="cerrarMenu()" aria-label="Ir al inicio">
+      <span class="brand-icon">CE</span>
+      <span class="brand-text">
+        <strong>Clubes CEUTEC</strong>
+        <small>Organizaciones estudiantiles</small>
+      </span>
+    </a>
 
-  <nav class="nav-links" aria-label="Navegación principal">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
-    <a routerLink="/clubes" routerLinkActive="active">Clubes</a>
+    <button class="hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuAbierto()" aria-label="Menú">
+      @if (menuAbierto()) {
+        <span class="ham-icon">✕</span>
+      } @else {
+        <span class="ham-icon">☰</span>
+      }
+    </button>
+  </div>
+
+  <!-- Links de navegación -->
+  <nav class="nav-links" [class.open]="menuAbierto()" aria-label="Navegación principal">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+       (click)="cerrarMenu()">Inicio</a>
+    <a routerLink="/clubes" routerLinkActive="active" (click)="cerrarMenu()">Clubes</a>
 
     @if (isLoggedIn()) {
-      <a routerLink="/panel-usuario" routerLinkActive="active">
+      <a routerLink="/panel-usuario" routerLinkActive="active" (click)="cerrarMenu()">
         {{ displayName() || 'Panel' }}
       </a>
     } @else {
-      <a routerLink="/login" routerLinkActive="active">Login</a>
-      <a class="register" routerLink="/registro" routerLinkActive="active">Registro</a>
+      <a routerLink="/login" routerLinkActive="active" (click)="cerrarMenu()">Login</a>
+      <a class="register" routerLink="/registro" routerLinkActive="active" (click)="cerrarMenu()">
+        Registro
+      </a>
     }
   </nav>
 </header>

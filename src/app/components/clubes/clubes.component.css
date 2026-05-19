@@ -1,6 +1,21 @@
-.club-list { margin-top: 22px; }
-.topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.members { color: #667085; font-weight: 700; font-size: 0.9rem; }
-.club-card h2 { margin-bottom: 8px; }
-.actions { margin-top: 16px; }
-.empty-state { text-align: center; padding: 48px 0; }
+/* ── Mobile base ─────────────────────────── */
+.search-bar {
+  margin-bottom: 16px;
+}
+.search-bar input {
+  width: 100%;
+}
+
+.club-list {
+  margin-top: 16px;
+}
+
+/* ── 480px ───────────────────────────────── */
+@media (min-width: 480px) {
+  .search-bar input { max-width: 400px; }
+}
+
+/* ── 768px ───────────────────────────────── */
+@media (min-width: 768px) {
+  .club-list { margin-top: 20px; }
+}
