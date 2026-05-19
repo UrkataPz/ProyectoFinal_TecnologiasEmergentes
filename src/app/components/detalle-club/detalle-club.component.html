@@ -3,14 +3,16 @@
     <div class="card">
       <p>Cargando información del club...</p>
     </div>
-  } @else if (club() === null) {
+
+  } @else if (!club()) {
     <div class="card">
       <h1>Club no encontrado</h1>
       <p>No se encontró información para este club.</p>
       <a class="btn btn-blue" routerLink="/clubes">Volver al directorio</a>
     </div>
+
   } @else {
-    <div class="card detail-card">
+    <div class="card detail-card card-primary">
       <div class="detail-header">
         <span class="badge">{{ club()!.categoria }}</span>
         @if (!club()!.activo) {
@@ -38,6 +40,33 @@
         </span>
       </div>
 
+      <!-- ── Eventos del club ────────────────────────── -->
+      <div class="eventos-section">
+        <h2>Próximos eventos</h2>
+
+        @if (eventos().length === 0) {
+          <p class="muted-msg">Este club no tiene eventos programados.</p>
+        } @else {
+          <div class="eventos-list">
+            @for (ev of eventos(); track ev.id) {
+              @if (ev.activo) {
+                <div class="evento-card">
+                  <div class="evento-header">
+                    <strong>{{ ev.titulo }}</strong>
+                    <span class="evento-fecha">
+                      📅 {{ formatearFecha(ev.fecha, ev.hora) }}
+                    </span>
+                  </div>
+                  <p>{{ ev.descripcion }}</p>
+                  <span class="evento-lugar">📍 {{ ev.lugar }}</span>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ── Feedback y acciones ─────────────────────── -->
       @if (mensajeAccion()) {
         <p class="notice"
            [class.notice-success]="mensajeAccion().startsWith('✅')"
@@ -48,13 +77,17 @@
 
       <div class="actions">
         @if (club()!.activo) {
-          <button class="btn btn-blue" (click)="solicitar()" [disabled]="enviando()">
-            @if (enviando()) {
-              <span class="spinner"></span> Enviando...
-            } @else {
-              Solicitar ingreso
-            }
-          </button>
+          @if (isLoggedIn()) {
+            <button class="btn btn-blue" (click)="solicitar()" [disabled]="enviando()">
+              @if (enviando()) {
+                <span class="spinner"></span> Enviando...
+              } @else {
+                Solicitar ingreso
+              }
+            </button>
+          } @else {
+            <a class="btn btn-blue" routerLink="/login">Inicia sesión para solicitar</a>
+          }
         }
         <a class="btn btn-light" routerLink="/clubes">Volver al directorio</a>
       </div>

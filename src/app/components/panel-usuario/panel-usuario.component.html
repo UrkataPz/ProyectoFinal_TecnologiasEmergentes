@@ -168,9 +168,16 @@
     <article class="card tab-content">
       <div class="tab-title-row">
         <h2>Gestión de clubes</h2>
-        @if (!mostrarFormClub()) {
-          <button class="btn btn-blue btn-sm" (click)="abrirFormNuevo()">+ Nuevo club</button>
-        }
+        <div class="btn-group">
+          @if (!mostrarFormClub()) {
+            <button class="btn btn-blue btn-sm" (click)="abrirFormNuevo()">+ Nuevo club</button>
+          }
+          @if (todosClubes().length === 0) {
+            <button class="btn btn-light btn-sm" (click)="inicializarDatos()" [disabled]="cargando()">
+              @if (cargando()) { Cargando... } @else { Cargar datos iniciales }
+            </button>
+          }
+        </div>
       </div>
 
       <!-- Formulario crear/editar -->
@@ -263,6 +270,117 @@
               <button class="btn btn-danger-sm" (click)="eliminarClub(club.id!, club.nombre)">Eliminar</button>
             </span>
           </div>
+        }
+      </div>
+    </article>
+  }
+
+  <!-- Tab: Gestión de Eventos (CRUD) -->
+  @if (tabActiva === 'admin-eventos') {
+    <article class="card tab-content">
+      <div class="tab-title-row">
+        <h2>Gestión de eventos</h2>
+        @if (!mostrarFormEvento()) {
+          <button class="btn btn-blue btn-sm" (click)="abrirFormEvento()">+ Nuevo evento</button>
+        }
+      </div>
+
+      @if (mostrarFormEvento()) {
+        <div class="form-club">
+          <h3>{{ editandoEventoId() ? 'Editar evento' : 'Nuevo evento' }}</h3>
+
+          <div class="form-group">
+            <label>Club</label>
+            <select [value]="formEvento().clubId ?? ''"
+                    (change)="actualizarCampoEvento('clubId', $any($event.target).value)">
+              <option value="">Selecciona el club</option>
+              @for (club of todosClubes(); track club.id) {
+                <option [value]="club.id">{{ club.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Título del evento</label>
+            <input type="text" placeholder="Ej: Taller de Angular"
+                   [value]="formEvento().titulo ?? ''"
+                   (input)="actualizarCampoEvento('titulo', $any($event.target).value)">
+          </div>
+
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea rows="2" placeholder="Descripción breve del evento"
+                      [value]="formEvento().descripcion ?? ''"
+                      (input)="actualizarCampoEvento('descripcion', $any($event.target).value)"></textarea>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label>Fecha</label>
+              <input type="date"
+                     [value]="formEvento().fecha ?? ''"
+                     (change)="actualizarCampoEvento('fecha', $any($event.target).value)">
+            </div>
+            <div class="form-group">
+              <label>Hora</label>
+              <input type="time"
+                     [value]="formEvento().hora ?? '08:00'"
+                     (change)="actualizarCampoEvento('hora', $any($event.target).value)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Lugar</label>
+            <input type="text" placeholder="Ej: Aula B-201, Campus Central"
+                   [value]="formEvento().lugar ?? ''"
+                   (input)="actualizarCampoEvento('lugar', $any($event.target).value)">
+          </div>
+
+          <div class="form-group check-group">
+            <label>
+              <input type="checkbox"
+                     [checked]="formEvento().activo ?? true"
+                     (change)="actualizarCampoEvento('activo', $any($event.target).checked)">
+              Evento activo (visible para estudiantes)
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-blue" (click)="guardarEvento()" [disabled]="cargando()">
+              @if (cargando()) { Guardando... } @else { Guardar }
+            </button>
+            <button class="btn btn-light" (click)="cancelarFormEvento()">Cancelar</button>
+          </div>
+        </div>
+      }
+
+      <!-- Tabla de eventos -->
+      <div class="table-like mt-sm">
+        @if (todosEventos().length === 0) {
+          <p class="muted">No hay eventos registrados.</p>
+        } @else {
+          <div class="row header row-5">
+            <span>Título</span>
+            <span>Club</span>
+            <span>Fecha</span>
+            <span>Lugar</span>
+            <span>Acciones</span>
+          </div>
+          @for (ev of todosEventos(); track ev.id) {
+            <div class="row row-5">
+              <span>
+                {{ ev.titulo }}
+                @if (!ev.activo) { <em class="inactive-tag">(inactivo)</em> }
+              </span>
+              <span><span class="badge badge-sm">{{ ev.clubNombre }}</span></span>
+              <span>{{ ev.fecha }} {{ ev.hora }}</span>
+              <span>{{ ev.lugar }}</span>
+              <span class="btn-group">
+                <button class="btn btn-light btn-sm" (click)="editarEvento(ev)">Editar</button>
+                <button class="btn btn-danger-sm" (click)="eliminarEvento(ev.id!, ev.titulo)">Eliminar</button>
+              </span>
+            </div>
+          }
         }
       </div>
     </article>

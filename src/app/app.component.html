@@ -1,7 +1,29 @@
 <app-navbar></app-navbar>
+
 <main>
   <router-outlet></router-outlet>
 </main>
+
 <footer class="footer">
-  <p>Proyecto académico - Tecnologías Emergentes | Sistema de Gestión de Clubes y Organizaciones Estudiantiles</p>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo">CE</span>
+      <div>
+        <strong>CEUTEC Clubes</strong>
+        <small>Sistema de Gestión de Organizaciones Estudiantiles</small>
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <a routerLink="/">Inicio</a>
+      <a routerLink="/clubes">Clubes</a>
+      <a routerLink="/login">Ingresar</a>
+      <a routerLink="/registro">Registro</a>
+    </div>
+
+    <div class="footer-copy">
+      <p>© 2025 Universidad Tecnológica Centroamericana — CEUTEC</p>
+      <p>Proyecto académico — Tecnologías Emergentes</p>
+    </div>
+  </div>
 </footer>

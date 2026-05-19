@@ -4,6 +4,7 @@ import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { switchMap, of } from 'rxjs';
 import { ClubesService } from '../../services/clubes.service';
 import { SolicitudesService } from '../../services/solicitudes.service';
+import { EventosService } from '../../services/eventos.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -14,15 +15,16 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './detalle-club.component.css'
 })
 export class DetalleClubComponent {
-  // withComponentInputBinding() mapea el param :id de la ruta a este input()
+  // withComponentInputBinding() mapea el param :id de la ruta
   id = input<string>('');
 
-  private clubesService = inject(ClubesService);
-  private solicitudesService = inject(SolicitudesService);
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private clubesService       = inject(ClubesService);
+  private solicitudesService  = inject(SolicitudesService);
+  private eventosService      = inject(EventosService);
+  private authService         = inject(AuthService);
+  private router              = inject(Router);
 
-  // Reactivo: cada vez que cambia id(), hace nueva consulta a Firestore
+  // Club reactivo: recarga cuando cambia id()
   readonly club = toSignal(
     toObservable(this.id).pipe(
       switchMap(id => id ? this.clubesService.getById(id) : of(undefined))
@@ -30,15 +32,33 @@ export class DetalleClubComponent {
     { initialValue: undefined }
   );
 
+  // Eventos del club en tiempo real
+  readonly eventos = toSignal(
+    toObservable(this.id).pipe(
+      switchMap(id => id ? this.eventosService.getByClub(id) : of([]))
+    ),
+    { initialValue: [] }
+  );
+
   readonly mensajeAccion = signal('');
-  readonly enviando = signal(false);
+  readonly enviando      = signal(false);
+
+  readonly isLoggedIn = this.authService.isLoggedIn;
+
+  formatearFecha(fecha: string, hora: string): string {
+    try {
+      const d = new Date(`${fecha}T${hora}`);
+      return d.toLocaleDateString('es-HN', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      }) + ' — ' + hora;
+    } catch {
+      return `${fecha} ${hora}`;
+    }
+  }
 
   async solicitar(): Promise<void> {
     const user = this.authService.currentUser();
-    if (!user) {
-      this.router.navigate(['/login']);
-      return;
-    }
+    if (!user) { this.router.navigate(['/login']); return; }
 
     const club = this.club();
     if (!club) return;
@@ -46,12 +66,12 @@ export class DetalleClubComponent {
     this.enviando.set(true);
     try {
       await this.solicitudesService.create({
-        usuarioId: user.uid,
+        usuarioId:    user.uid,
         usuarioNombre: user.displayName ?? user.email ?? '',
         usuarioEmail: user.email ?? '',
-        clubId: club.id!,
-        clubNombre: club.nombre,
-        estado: 'pendiente'
+        clubId:       club.id!,
+        clubNombre:   club.nombre,
+        estado:       'pendiente'
       });
       this.mensajeAccion.set('✅ Solicitud enviada correctamente');
     } catch {
