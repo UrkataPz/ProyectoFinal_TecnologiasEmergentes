@@ -74,6 +74,15 @@ export class PanelUsuarioComponent {
     { initialValue: [] }
   );
 
+  // ── Miembros por club (conteo dinámico de solicitudes aprobadas) ──────────
+  readonly miembrosPorClub = computed(() => {
+    const map: Record<string, number | undefined> = {};
+    this.todasSolicitudes()
+      .filter(s => s.estado === 'aprobada')
+      .forEach(s => { map[s.clubId] = (map[s.clubId] ?? 0) + 1; });
+    return map;
+  });
+
   // ── Stats ─────────────────────────────────────────────────────────────────
   readonly totalClubes = computed(() => this.todosClubes().length);
   readonly solicitudesPendientes = computed(() =>
@@ -123,7 +132,7 @@ export class PanelUsuarioComponent {
   readonly mostrarFormClub = signal(false);
   readonly editandoId = signal<string | null>(null);
   readonly formClub = signal<Partial<Club>>({
-    nombre: '', categoria: '', descripcion: '', objetivo: '', requisitos: '', miembros: 0, activo: true
+    nombre: '', categoria: '', descripcion: '', objetivo: '', requisitos: '', activo: true
   });
   readonly mensajePanel = signal('');
   readonly cargando = signal(false);
@@ -133,7 +142,7 @@ export class PanelUsuarioComponent {
   // ── Acciones de club ──────────────────────────────────────────────────────
   abrirFormNuevo(): void {
     this.editandoId.set(null);
-    this.formClub.set({ nombre: '', categoria: '', descripcion: '', objetivo: '', requisitos: '', miembros: 0, activo: true });
+    this.formClub.set({ nombre: '', categoria: '', descripcion: '', objetivo: '', requisitos: '', activo: true });
     this.mostrarFormClub.set(true);
   }
 
@@ -167,7 +176,7 @@ export class PanelUsuarioComponent {
         descripcion: f.descripcion!,
         objetivo: f.objetivo!,
         requisitos: f.requisitos!,
-        miembros: f.miembros ?? 0,
+        miembros: this.miembrosPorClub()[this.editandoId() ?? ''] ?? 0,
         activo: f.activo ?? true
       };
 
@@ -320,10 +329,22 @@ export class PanelUsuarioComponent {
 
   // ── Acciones de solicitud ─────────────────────────────────────────────────
   async cambiarEstado(id: string, estado: EstadoSolicitud): Promise<void> {
-    // Buscar la solicitud para obtener el usuarioId y clubNombre
     const solicitud = this.todasSolicitudes().find(s => s.id === id);
     try {
       await this.solicitudesService.update(id, { estado });
+
+      if (solicitud) {
+        // Sincronizar miembros del club en Firestore
+        const prevEstado = solicitud.estado;
+        const clubId = solicitud.clubId;
+        const currentCount = this.miembrosPorClub()[clubId] ?? 0;
+        let newCount = currentCount;
+        if (estado === 'aprobada' && prevEstado !== 'aprobada') newCount++;
+        else if (estado !== 'aprobada' && prevEstado === 'aprobada') newCount = Math.max(0, newCount - 1);
+        if (newCount !== currentCount) {
+          await this.clubesService.update(clubId, { miembros: newCount });
+        }
+      }
 
       // Crear notificación en tiempo real para el estudiante
       if (solicitud) {

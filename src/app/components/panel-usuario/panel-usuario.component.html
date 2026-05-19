@@ -224,13 +224,6 @@
                    (input)="actualizarCampo('requisitos', $any($event.target).value)">
           </div>
 
-          <div class="form-group">
-            <label>Número de miembros</label>
-            <input type="number" min="0"
-                   [value]="formClub().miembros ?? 0"
-                   (input)="actualizarCampo('miembros', +$any($event.target).value)">
-          </div>
-
           <div class="form-group check-group">
             <label>
               <input type="checkbox"
@@ -264,7 +257,7 @@
               @if (!club.activo) { <em class="inactive-tag">(inactivo)</em> }
             </span>
             <span><span class="badge badge-sm">{{ club.categoria }}</span></span>
-            <span>{{ club.miembros }}</span>
+            <span>{{ miembrosPorClub()[club.id!] ?? 0 }}</span>
             <span class="btn-group">
               <button class="btn btn-light btn-sm" (click)="editarClub(club)">Editar</button>
               <button class="btn btn-danger-sm" (click)="eliminarClub(club.id!, club.nombre)">Eliminar</button>
