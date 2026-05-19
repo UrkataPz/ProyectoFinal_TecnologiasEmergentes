@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
@@ -11,7 +11,16 @@ import { AuthService } from '../../services/auth.service';
 })
 export class NavbarComponent {
   readonly authService = inject(AuthService);
-
-  readonly isLoggedIn = this.authService.isLoggedIn;
+  readonly isLoggedIn  = this.authService.isLoggedIn;
   readonly displayName = this.authService.displayName;
+
+  menuAbierto = signal(false);
+
+  toggleMenu(): void {
+    this.menuAbierto.update(v => !v);
+  }
+
+  cerrarMenu(): void {
+    this.menuAbierto.set(false);
+  }
 }
