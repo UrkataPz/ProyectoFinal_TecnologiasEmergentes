@@ -32,7 +32,6 @@ export class PanelUsuarioComponent {
   private userService          = inject(UserService);
   private router               = inject(Router);
 
-  // ── Datos del usuario ──────────────────────────────────────────────────────
   readonly perfil = toSignal(
     toObservable(this.authService.uid).pipe(
       switchMap(uid => uid ? this.userService.getProfile(uid) : of(undefined))
@@ -46,7 +45,6 @@ export class PanelUsuarioComponent {
   readonly formPerfil = signal({ nombre: '', correo: '', carrera: '' });
 
   constructor() {
-    // Sincronizar el formulario con los datos de Firestore cuando carguen
     effect(() => {
       const p = this.perfil();
       this.formPerfil.set({
@@ -57,7 +55,6 @@ export class PanelUsuarioComponent {
     });
   }
 
-  // ── Solicitudes del usuario logueado ──────────────────────────────────────
   readonly misSolicitudes = toSignal(
     toObservable(this.authService.uid).pipe(
       switchMap(uid => uid ? this.solicitudesService.getByUsuario(uid) : of([]))
@@ -65,16 +62,13 @@ export class PanelUsuarioComponent {
     { initialValue: [] }
   );
 
-  // ── Todos los clubes (para admin y para stats) ────────────────────────────
   readonly todosClubes = toSignal(this.clubesService.getAll(), { initialValue: [] });
 
-  // ── Todas las solicitudes (admin) ─────────────────────────────────────────
   readonly todasSolicitudes = toSignal(
     this.solicitudesService.getAll(),
     { initialValue: [] }
   );
 
-  // ── Miembros por club (conteo dinámico de solicitudes aprobadas) ──────────
   readonly miembrosPorClub = computed(() => {
     const map: Record<string, number | undefined> = {};
     this.todasSolicitudes()
@@ -83,7 +77,6 @@ export class PanelUsuarioComponent {
     return map;
   });
 
-  // ── Stats ─────────────────────────────────────────────────────────────────
   readonly totalClubes = computed(() => this.todosClubes().length);
   readonly solicitudesPendientes = computed(() =>
     this.misSolicitudes().filter(s => s.estado === 'pendiente').length
@@ -92,7 +85,6 @@ export class PanelUsuarioComponent {
     this.misSolicitudes().filter(s => s.estado === 'aprobada').length
   );
 
-  // ── Tabs del panel ────────────────────────────────────────────────────────
   readonly tabsPanel: { id: PanelTab; label: string }[] = [
     { id: 'solicitudes',       label: 'Mis solicitudes' },
     { id: 'clubes',            label: 'Directorio' },
@@ -101,7 +93,6 @@ export class PanelUsuarioComponent {
     { id: 'admin-solicitudes', label: 'Todas las solicitudes' }
   ];
 
-  // ── Eventos ───────────────────────────────────────────────────────────────
   readonly todosEventos = toSignal(this.eventosService.getAll(), { initialValue: [] });
 
   readonly mostrarFormEvento = signal(false);
@@ -128,7 +119,6 @@ export class PanelUsuarioComponent {
     return this.tabActiva === tab;
   }
 
-  // ── Formulario de club ────────────────────────────────────────────────────
   readonly mostrarFormClub = signal(false);
   readonly editandoId = signal<string | null>(null);
   readonly formClub = signal<Partial<Club>>({
@@ -139,7 +129,6 @@ export class PanelUsuarioComponent {
 
   readonly categorias = ['Tecnología', 'Negocios', 'Social', 'Cultura', 'Deportes', 'Arte', 'Académico'];
 
-  // ── Acciones de club ──────────────────────────────────────────────────────
   abrirFormNuevo(): void {
     this.editandoId.set(null);
     this.formClub.set({ nombre: '', categoria: '', descripcion: '', objetivo: '', requisitos: '', activo: true });
@@ -246,7 +235,6 @@ export class PanelUsuarioComponent {
     }
   }
 
-  // ── Acciones de eventos ───────────────────────────────────────────────────
   abrirFormEvento(): void {
     this.editandoEventoId.set(null);
     this.formEvento.set({
@@ -327,14 +315,12 @@ export class PanelUsuarioComponent {
     }
   }
 
-  // ── Acciones de solicitud ─────────────────────────────────────────────────
   async cambiarEstado(id: string, estado: EstadoSolicitud): Promise<void> {
     const solicitud = this.todasSolicitudes().find(s => s.id === id);
     try {
       await this.solicitudesService.update(id, { estado });
 
       if (solicitud) {
-        // Sincronizar miembros del club en Firestore
         const prevEstado = solicitud.estado;
         const clubId = solicitud.clubId;
         const currentCount = this.miembrosPorClub()[clubId] ?? 0;
@@ -346,7 +332,6 @@ export class PanelUsuarioComponent {
         }
       }
 
-      // Crear notificación en tiempo real para el estudiante
       if (solicitud) {
         const titulo  = estado === 'aprobada'
           ? `¡Ingreso aprobado al ${solicitud.clubNombre}!`

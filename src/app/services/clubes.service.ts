@@ -106,7 +106,6 @@ export class ClubesService {
     await deleteDoc(doc(this.firestore, 'clubes', id));
   }
 
-  /** Carga los 6 clubes iniciales de CEUTEC si la colección está vacía. */
   async seedSiVacio(): Promise<{ insertados: number }> {
     const snapshot = await getDocs(this.colRef);
     if (!snapshot.empty) return { insertados: 0 };

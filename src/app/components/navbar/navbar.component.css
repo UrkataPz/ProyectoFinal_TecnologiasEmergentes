@@ -1,8 +1,3 @@
-/* ═══════════════════════════════════════════════
-   NAVBAR — Estilo UNITEC/CEUTEC
-═══════════════════════════════════════════════ */
-
-/* Franja superior institucional */
 .top-bar {
   background: var(--accent);
   color: var(--white);
@@ -13,7 +8,6 @@
   letter-spacing: 0.03em;
 }
 
-/* Navbar principal */
 .navbar {
   position: sticky;
   top: 0;
@@ -30,7 +24,6 @@
   padding: 10px 16px;
 }
 
-/* Marca */
 .brand {
   display: flex;
   align-items: center;
@@ -63,14 +56,12 @@
   margin-top: 1px;
 }
 
-/* Agrupa campana + hamburger en móvil */
 .nav-actions-mobile {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* Hamburger */
 .hamburger {
   display: flex;
   align-items: center;
@@ -85,7 +76,6 @@
 }
 .ham-icon { font-size: 1.1rem; color: var(--white); }
 
-/* Nav links — colapsadas en móvil */
 .nav-links {
   display: none;
   flex-direction: column;
@@ -120,12 +110,10 @@
 .nav-links .register:hover,
 .nav-links .register.active { background: #a80d26; }
 
-/* ── Campana de notificaciones ─────────────── */
 .notif-wrap {
   position: relative;
 }
 
-/* Ocultar campana desktop en móvil */
 .notif-desktop { display: none; }
 
 .notif-btn {
@@ -161,7 +149,6 @@
   line-height: 1;
 }
 
-/* Dropdown de notificaciones */
 .notif-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -277,7 +264,6 @@
 }
 .notif-del:hover { background: var(--border); color: var(--accent); }
 
-/* ── 768px: nav horizontal ─────────────────── */
 @media (min-width: 768px) {
   .navbar {
     display: flex;
@@ -299,7 +285,6 @@
     flex: 0 0 auto;
   }
 
-  /* Ocultar campana móvil y hamburger en desktop */
   .nav-actions-mobile { display: none; }
 
   .hamburger { display: none; }
@@ -319,7 +304,6 @@
   .nav-links a { padding: 8px 12px; font-size: 0.88rem; border-radius: var(--radius-xs); }
   .nav-links .register { margin-top: 0; margin-left: 6px; padding: 8px 16px; }
 
-  /* Mostrar campana desktop */
   .notif-desktop { display: flex; }
 }
 

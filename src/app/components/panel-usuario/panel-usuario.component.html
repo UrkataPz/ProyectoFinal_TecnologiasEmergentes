@@ -1,5 +1,4 @@
 <section class="page">
-  <!-- Encabezado del panel -->
   <div class="panel-header">
     <div>
       <span class="badge">Panel personal</span>
@@ -61,7 +60,6 @@
     </article>
   </div>
 
-  <!-- Stats -->
   <div class="grid grid-3 stats-row">
     <article class="card metric">
       <strong>{{ totalClubes() }}</strong>
@@ -82,7 +80,6 @@
     </article>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs" role="tablist" aria-label="Secciones del panel">
     @for (tab of tabsPanel; track tab.id) {
       <button type="button"
@@ -104,7 +101,6 @@
     </p>
   }
 
-  <!-- Tab: Mis Solicitudes -->
   @if (tabActiva === 'solicitudes') {
     <article class="card tab-content">
       <h2>Mis solicitudes de ingreso</h2>
@@ -143,7 +139,6 @@
     </article>
   }
 
-  <!-- Tab: Directorio de clubes -->
   @if (tabActiva === 'clubes') {
     <article class="card tab-content">
       <h2>Clubes disponibles</h2>
@@ -163,7 +158,6 @@
     </article>
   }
 
-  <!-- Tab: Gestión de Clubes (CRUD) -->
   @if (tabActiva === 'admin-clubes') {
     <article class="card tab-content">
       <div class="tab-title-row">
@@ -180,27 +174,28 @@
         </div>
       </div>
 
-      <!-- Formulario crear/editar -->
       @if (mostrarFormClub()) {
         <div class="form-club">
           <h3>{{ editandoId() ? 'Editar club' : 'Nuevo club' }}</h3>
 
-          <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" placeholder="Nombre del club"
-                   [value]="formClub().nombre ?? ''"
-                   (input)="actualizarCampo('nombre', $any($event.target).value)">
-          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre</label>
+              <input type="text" placeholder="Nombre del club"
+                     [value]="formClub().nombre ?? ''"
+                     (input)="actualizarCampo('nombre', $any($event.target).value)">
+            </div>
 
-          <div class="form-group">
-            <label>Categoría</label>
-            <select [value]="formClub().categoria ?? ''"
-                    (change)="actualizarCampo('categoria', $any($event.target).value)">
-              <option value="">Selecciona una categoría</option>
-              @for (cat of categorias; track cat) {
-                <option [value]="cat">{{ cat }}</option>
-              }
-            </select>
+            <div class="form-group">
+              <label>Categoría</label>
+              <select [value]="formClub().categoria ?? ''"
+                      (change)="actualizarCampo('categoria', $any($event.target).value)">
+                <option value="">Selecciona una categoría</option>
+                @for (cat of categorias; track cat) {
+                  <option [value]="cat">{{ cat }}</option>
+                }
+              </select>
+            </div>
           </div>
 
           <div class="form-group">
@@ -242,8 +237,8 @@
         </div>
       }
 
-      <!-- Tabla de clubes -->
-      <div class="table-like mt-sm">
+      <div class="table-wrap mt-sm">
+      <div class="table-like">
         <div class="row header row-4">
           <span>Nombre</span>
           <span>Categoría</span>
@@ -265,10 +260,10 @@
           </div>
         }
       </div>
+      </div>
     </article>
   }
 
-  <!-- Tab: Gestión de Eventos (CRUD) -->
   @if (tabActiva === 'admin-eventos') {
     <article class="card tab-content">
       <div class="tab-title-row">
@@ -379,7 +374,6 @@
     </article>
   }
 
-  <!-- Tab: Todas las solicitudes (admin) -->
   @if (tabActiva === 'admin-solicitudes') {
     <article class="card tab-content">
       <h2>Gestión de solicitudes</h2>

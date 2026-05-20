@@ -1,16 +1,11 @@
-/* ═══════════════════════════════════════════════
-   VARIABLES — Paleta UNITEC / CEUTEC
-═══════════════════════════════════════════════ */
 :root {
-  /* Institucionales */
-  --primary:       #003087;   /* Navy UNITEC */
+  --primary:       #003087;
   --primary-dark:  #002060;
   --primary-light: #1a52a8;
-  --accent:        #C8102E;   /* Rojo UNITEC */
+  --accent:        #C8102E;
   --accent-light:  #FDECEA;
-  --gold:          #F0A500;   /* Dorado universitario */
+  --gold:          #F0A500;
 
-  /* Interfaz */
   --secondary:     #E8EEF7;
   --bg:            #F0F3F8;
   --white:         #FFFFFF;
@@ -18,7 +13,6 @@
   --muted:         #6B7280;
   --border:        #D1D9E6;
 
-  /* Estados */
   --success:       #166534;
   --success-bg:    #DCFCE7;
   --danger:        #C8102E;
@@ -26,36 +20,31 @@
   --warning-bg:    #FEF9C3;
   --warning-text:  #854d0e;
 
-  /* Sombras */
   --shadow:        0 2px 8px rgba(0, 48, 135, 0.08);
   --shadow-md:     0 4px 18px rgba(0, 48, 135, 0.10);
   --shadow-lg:     0 12px 40px rgba(0, 48, 135, 0.14);
 
-  /* Bordes */
   --radius:        14px;
   --radius-sm:     8px;
   --radius-xs:     6px;
 }
 
-/* ═══════════════════════════════════════════════
-   RESET & BASE
-═══════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; scroll-behavior: smooth; }
+html { font-size: 16px; scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: 1.55;
+  overflow-x: hidden;
 }
 
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
-/* ═══════════════════════════════════════════════
-   LAYOUT
-═══════════════════════════════════════════════ */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
 .page {
   width: 100%;
   padding: 16px 14px 48px;
@@ -71,9 +60,6 @@ img { max-width: 100%; display: block; }
 }
 @media (min-width: 1024px) { .page { padding: 36px 0 64px; } }
 
-/* ═══════════════════════════════════════════════
-   HERO
-═══════════════════════════════════════════════ */
 .hero {
   display: flex;
   flex-direction: column;
@@ -117,9 +103,6 @@ img { max-width: 100%; display: block; }
   .hero { padding: 48px; }
 }
 
-/* ═══════════════════════════════════════════════
-   SECTION TITLE
-═══════════════════════════════════════════════ */
 .section-title { margin-bottom: 22px; }
 .section-title h1,
 .section-title h2 {
@@ -132,9 +115,6 @@ img { max-width: 100%; display: block; }
 .section-title.center { text-align: center; }
 .section-title .badge { margin-bottom: 10px; display: inline-flex; }
 
-/* ═══════════════════════════════════════════════
-   GRID — Mobile First
-═══════════════════════════════════════════════ */
 .grid   { display: grid; gap: 14px; }
 .grid-2 { grid-template-columns: 1fr; }
 .grid-3 { grid-template-columns: 1fr; }
@@ -149,9 +129,6 @@ img { max-width: 100%; display: block; }
   .grid-3 { grid-template-columns: repeat(3, 1fr); gap: 20px; }
 }
 
-/* ═══════════════════════════════════════════════
-   CARD
-═══════════════════════════════════════════════ */
 .card {
   background: var(--white);
   border: 1px solid var(--border);
@@ -163,7 +140,6 @@ img { max-width: 100%; display: block; }
 .card h2, .card h3 { margin-top: 0; margin-bottom: 8px; color: var(--primary-dark); }
 .card p { color: var(--muted); line-height: 1.65; font-size: 0.95rem; }
 
-/* Tarjeta con acento izquierdo — estilo institucional */
 .card-accent { border-left: 4px solid var(--accent); }
 .card-primary { border-left: 4px solid var(--primary); }
 
@@ -173,9 +149,6 @@ img { max-width: 100%; display: block; }
   .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
 }
 
-/* ═══════════════════════════════════════════════
-   BADGE
-═══════════════════════════════════════════════ */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -192,9 +165,6 @@ img { max-width: 100%; display: block; }
 .badge-inactive{ background: var(--danger-bg);   color: var(--danger); }
 .badge-sm      { padding: 3px 9px; font-size: 0.72rem; }
 
-/* ═══════════════════════════════════════════════
-   BUTTONS
-═══════════════════════════════════════════════ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -224,9 +194,6 @@ img { max-width: 100%; display: block; }
 
 @media (min-width: 480px) { .btn { padding: 11px 20px; } }
 
-/* ═══════════════════════════════════════════════
-   ACTIONS ROW
-═══════════════════════════════════════════════ */
 .actions {
   display: flex;
   flex-direction: column;
@@ -237,9 +204,6 @@ img { max-width: 100%; display: block; }
   .actions { flex-direction: row; flex-wrap: wrap; }
 }
 
-/* ═══════════════════════════════════════════════
-   FORMS
-═══════════════════════════════════════════════ */
 .form-card {
   width: 100%;
   margin: 0 auto;
@@ -267,9 +231,6 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(0,48,135,0.1);
 }
 
-/* ═══════════════════════════════════════════════
-   TABLE-LIKE ROWS
-═══════════════════════════════════════════════ */
 .table-like { display: grid; gap: 8px; }
 
 .row {
@@ -297,9 +258,6 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* ═══════════════════════════════════════════════
-   NOTICES / FEEDBACK
-═══════════════════════════════════════════════ */
 .notice {
   padding: 12px 16px;
   border-radius: var(--radius-sm);
@@ -313,9 +271,6 @@ input:focus, select:focus, textarea:focus {
 .notice-success { background: var(--success-bg); color: var(--success); border-left-color: var(--success); }
 .notice-error   { background: var(--danger-bg);  color: var(--danger);  border-left-color: var(--danger); }
 
-/* ═══════════════════════════════════════════════
-   MISC UTILITIES
-═══════════════════════════════════════════════ */
 .center  { text-align: center; }
 .mt      { margin-top: 28px; }
 .muted   { color: var(--muted); }
@@ -329,9 +284,6 @@ input:focus, select:focus, textarea:focus {
 .empty-state { text-align: center; padding: 40px 16px; color: var(--muted); }
 .empty-state a { margin-top: 14px; display: inline-flex; }
 
-/* ═══════════════════════════════════════════════
-   SPINNER
-═══════════════════════════════════════════════ */
 .spinner {
   display: inline-block;
   width: 14px;
@@ -344,9 +296,6 @@ input:focus, select:focus, textarea:focus {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ═══════════════════════════════════════════════
-   DETALLE CLUB
-═══════════════════════════════════════════════ */
 .detail-header { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 .detail-card   { max-width: 100%; }
 .descripcion   { font-size: 1rem; color: var(--muted); line-height: 1.75; }
@@ -359,9 +308,6 @@ input:focus, select:focus, textarea:focus {
   .detail-card { max-width: 860px; margin: 0 auto; }
 }
 
-/* ═══════════════════════════════════════════════
-   INICIO — PASOS
-═══════════════════════════════════════════════ */
 .paso-card  { text-align: center; }
 .paso-num {
   display: inline-flex;

@@ -23,7 +23,6 @@ export class NavbarComponent {
   menuAbierto   = signal(false);
   notifAbiertas = signal(false);
 
-  // Notificaciones en tiempo real del usuario logueado
   readonly notificaciones = toSignal(
     toObservable(this.authService.uid).pipe(
       switchMap(uid => uid ? this.notifService.getByUsuario(uid) : of([]))

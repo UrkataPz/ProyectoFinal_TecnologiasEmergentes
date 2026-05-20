@@ -15,7 +15,6 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './detalle-club.component.css'
 })
 export class DetalleClubComponent {
-  // withComponentInputBinding() mapea el param :id de la ruta
   id = input<string>('');
 
   private clubesService       = inject(ClubesService);
@@ -24,7 +23,6 @@ export class DetalleClubComponent {
   private authService         = inject(AuthService);
   private router              = inject(Router);
 
-  // Club reactivo: recarga cuando cambia id()
   readonly club = toSignal(
     toObservable(this.id).pipe(
       switchMap(id => id ? this.clubesService.getById(id) : of(undefined))
@@ -32,7 +30,6 @@ export class DetalleClubComponent {
     { initialValue: undefined }
   );
 
-  // Eventos del club en tiempo real
   readonly eventos = toSignal(
     toObservable(this.id).pipe(
       switchMap(id => id ? this.eventosService.getByClub(id) : of([]))
