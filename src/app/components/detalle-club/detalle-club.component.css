@@ -1,7 +1,7 @@
-/* ── Mobile base ─────────────────────────── */
 .detail-card h1 {
-  font-size: clamp(1.4rem, 4vw, 2.8rem);
+  font-size: clamp(1.4rem, 4vw, 2.6rem);
   margin: 10px 0 12px;
+  color: var(--primary-dark);
 }
 
 .actions {
@@ -11,13 +11,43 @@
   margin-top: 20px;
 }
 
-/* ── 480px ───────────────────────────────── */
-@media (min-width: 480px) {
-  .actions { flex-direction: row; flex-wrap: wrap; }
+.eventos-section {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.eventos-section h2 { margin-bottom: 14px; }
+
+.eventos-list { display: grid; gap: 12px; }
+
+.evento-card {
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
 }
 
-/* ── 768px ───────────────────────────────── */
+.evento-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.evento-header strong { font-size: 1rem; color: var(--primary-dark); }
+.evento-fecha { font-size: 0.82rem; color: var(--primary); font-weight: 600; }
+
+.evento-card p { font-size: 0.9rem; margin-bottom: 8px; }
+.evento-lugar { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+.muted-msg { color: var(--muted); font-size: 0.9rem; }
+
+@media (min-width: 480px) {
+  .actions { flex-direction: row; flex-wrap: wrap; }
+  .evento-header { flex-direction: row; justify-content: space-between; align-items: flex-start; }
+}
+
 @media (min-width: 768px) {
   .detail-card h1 { margin: 12px 0 16px; }
   .actions { margin-top: 28px; }
+  .eventos-list { grid-template-columns: repeat(2, 1fr); }
 }

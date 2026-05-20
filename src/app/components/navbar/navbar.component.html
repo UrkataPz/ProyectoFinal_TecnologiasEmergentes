@@ -1,38 +1,122 @@
+<div class="top-bar">
+  Universidad Tecnológica Centroamericana — CEUTEC | Sistema de Clubes Estudiantiles
+</div>
+
 <header class="navbar">
-  <!-- Marca + botón hamburguesa -->
-  <div class="navbar-top">
-    <a class="brand" routerLink="/" (click)="cerrarMenu()" aria-label="Ir al inicio">
-      <span class="brand-icon">CE</span>
-      <span class="brand-text">
-        <strong>Clubes CEUTEC</strong>
-        <small>Organizaciones estudiantiles</small>
-      </span>
-    </a>
+  <div class="navbar-inner">
+    <div class="navbar-top">
+      <a class="brand" routerLink="/" (click)="cerrarMenu()" aria-label="Ir al inicio">
+        <span class="brand-icon">CE</span>
+        <span class="brand-text">
+          <strong>CEUTEC Clubes</strong>
+          <small>Organizaciones estudiantiles</small>
+        </span>
+      </a>
 
-    <button class="hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuAbierto()" aria-label="Menú">
-      @if (menuAbierto()) {
-        <span class="ham-icon">✕</span>
+      <div class="nav-actions-mobile">
+          @if (isLoggedIn()) {
+          <div class="notif-wrap">
+            <button class="notif-btn" (click)="toggleNotif()" aria-label="Notificaciones">
+              🔔
+              @if (noLeidas() > 0) {
+                <span class="notif-badge">{{ noLeidas() > 9 ? '9+' : noLeidas() }}</span>
+              }
+            </button>
+
+            @if (notifAbiertas()) {
+              <div class="notif-dropdown">
+                <div class="notif-header">
+                  <span>Notificaciones</span>
+                  @if (noLeidas() > 0) {
+                    <button class="notif-mark-all" (click)="marcarTodas()">Marcar todas</button>
+                  }
+                </div>
+                @if (notificaciones().length === 0) {
+                  <p class="notif-empty">Sin notificaciones</p>
+                } @else {
+                  <ul class="notif-list">
+                    @for (n of notificaciones(); track n.id) {
+                      <li class="notif-item" [ngClass]="{ 'notif-unread': !n.leida }"
+                          (click)="marcarLeida(n.id!)">
+                        <span class="notif-icon">{{ iconoPorTipo(n.tipo) }}</span>
+                        <div class="notif-body">
+                          <strong>{{ n.titulo }}</strong>
+                          <p>{{ n.mensaje }}</p>
+                        </div>
+                        <button class="notif-del" (click)="eliminarNotif(n.id!, $event)"
+                                aria-label="Eliminar">✕</button>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <button class="hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuAbierto()" aria-label="Menú">
+          @if (menuAbierto()) {
+            <span class="ham-icon">✕</span>
+          } @else {
+            <span class="ham-icon">☰</span>
+          }
+        </button>
+      </div>
+    </div>
+
+    <nav class="nav-links" [class.open]="menuAbierto()" aria-label="Navegación principal">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+         (click)="cerrarMenu()">Inicio</a>
+      <a routerLink="/clubes" routerLinkActive="active" (click)="cerrarMenu()">Clubes</a>
+
+      @if (isLoggedIn()) {
+        <a routerLink="/panel-usuario" routerLinkActive="active" (click)="cerrarMenu()">
+          {{ displayName() || 'Panel' }}
+        </a>
+
+        <div class="notif-wrap notif-desktop">
+          <button class="notif-btn" (click)="toggleNotif()" aria-label="Notificaciones">
+            🔔
+            @if (noLeidas() > 0) {
+              <span class="notif-badge">{{ noLeidas() > 9 ? '9+' : noLeidas() }}</span>
+            }
+          </button>
+
+          @if (notifAbiertas()) {
+            <div class="notif-dropdown notif-dropdown-right">
+              <div class="notif-header">
+                <span>Notificaciones</span>
+                @if (noLeidas() > 0) {
+                  <button class="notif-mark-all" (click)="marcarTodas()">Marcar todas</button>
+                }
+              </div>
+              @if (notificaciones().length === 0) {
+                <p class="notif-empty">Sin notificaciones</p>
+              } @else {
+                <ul class="notif-list">
+                  @for (n of notificaciones(); track n.id) {
+                    <li class="notif-item" [ngClass]="{ 'notif-unread': !n.leida }"
+                        (click)="marcarLeida(n.id!)">
+                      <span class="notif-icon">{{ iconoPorTipo(n.tipo) }}</span>
+                      <div class="notif-body">
+                        <strong>{{ n.titulo }}</strong>
+                        <p>{{ n.mensaje }}</p>
+                      </div>
+                      <button class="notif-del" (click)="eliminarNotif(n.id!, $event)"
+                              aria-label="Eliminar">✕</button>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </div>
       } @else {
-        <span class="ham-icon">☰</span>
+        <a routerLink="/login" routerLinkActive="active" (click)="cerrarMenu()">Login</a>
+        <a class="register" routerLink="/registro" routerLinkActive="active" (click)="cerrarMenu()">
+          Registro
+        </a>
       }
-    </button>
+    </nav>
   </div>
-
-  <!-- Links de navegación -->
-  <nav class="nav-links" [class.open]="menuAbierto()" aria-label="Navegación principal">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-       (click)="cerrarMenu()">Inicio</a>
-    <a routerLink="/clubes" routerLinkActive="active" (click)="cerrarMenu()">Clubes</a>
-
-    @if (isLoggedIn()) {
-      <a routerLink="/panel-usuario" routerLinkActive="active" (click)="cerrarMenu()">
-        {{ displayName() || 'Panel' }}
-      </a>
-    } @else {
-      <a routerLink="/login" routerLinkActive="active" (click)="cerrarMenu()">Login</a>
-      <a class="register" routerLink="/registro" routerLinkActive="active" (click)="cerrarMenu()">
-        Registro
-      </a>
-    }
-  </nav>
 </header>

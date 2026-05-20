@@ -1,21 +1,52 @@
-/* ── Mobile base ─────────────────────────── */
+/* ═══════════════════════════════════════════════
+   CLUBES — Mobile First
+═══════════════════════════════════════════════ */
+
+/* ── Barra de búsqueda ────────────────────────
+   Móvil (< 480px): input full-width, contador debajo
+   Desde 480px: input + contador en fila (Flexbox)
+   Desde 768px: input se expande, contador a la derecha
+──────────────────────────────────────────────── */
 .search-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 16px;
 }
+
 .search-bar input {
   width: 100%;
+  flex: 1;
 }
 
-.club-list {
-  margin-top: 16px;
+.search-count {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+  align-self: center;
 }
 
-/* ── 480px ───────────────────────────────── */
+.club-list { margin-top: 16px; }
+
+/* ── 480px: flex row — input y contador lado a lado ── */
 @media (min-width: 480px) {
+  .search-bar {
+    flex-direction: row;
+    align-items: center;
+  }
+
   .search-bar input { max-width: 400px; }
 }
 
-/* ── 768px ───────────────────────────────── */
+/* ── 768px: input más ancho ─────────────────── */
 @media (min-width: 768px) {
+  .search-bar input { max-width: 520px; }
   .club-list { margin-top: 20px; }
+}
+
+/* ── 1024px: búsqueda ocupa todo el ancho disponible ── */
+@media (min-width: 1024px) {
+  .search-bar { justify-content: space-between; }
+  .search-bar input { max-width: 600px; }
 }

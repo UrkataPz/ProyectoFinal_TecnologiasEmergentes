@@ -11,6 +11,9 @@
       placeholder="Buscar por nombre o categoría..."
       [value]="filtro()"
       (input)="filtro.set($any($event.target).value)">
+    <span class="search-count">
+      {{ clubesFiltrados().length }} resultado{{ clubesFiltrados().length !== 1 ? 's' : '' }}
+    </span>
   </div>
 
   @if (mensajeAccion()) {
