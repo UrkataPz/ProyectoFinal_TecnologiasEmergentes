@@ -7,7 +7,7 @@ export interface UserProfile {
   nombre: string;
   correo: string;
   carrera: string;
-  rol: 'Estudiante' | 'Admin';
+  rol: 'Estudiante' | 'Admin' | 'Moderador';
 }
 
 @Injectable({

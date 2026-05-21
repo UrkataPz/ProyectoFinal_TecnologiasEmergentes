@@ -11,6 +11,22 @@
       <a class="btn btn-blue" routerLink="/clubes">Volver al directorio</a>
     </div>
 
+  } @else if (!accesoPermitido()) {
+    <div class="card access-gate">
+      <div class="gate-icon">🔒</div>
+      <h2>{{ club()!.nombre }}</h2>
+
+      @if (miSolicitud()?.estado === 'pendiente') {
+        <span class="badge">Solicitud pendiente</span>
+        <p>Tu solicitud está siendo revisada. Te notificaremos cuando sea procesada.</p>
+      } @else if (miSolicitud()?.estado === 'rechazada') {
+        <span class="badge badge-inactive">Solicitud rechazada</span>
+        <p>Tu solicitud de ingreso no fue aprobada en esta ocasión.</p>
+      }
+
+      <a class="btn btn-light" routerLink="/clubes">Volver al directorio</a>
+    </div>
+
   } @else {
     <div class="card detail-card card-primary">
       <div class="detail-header">
@@ -76,13 +92,17 @@
       <div class="actions">
         @if (club()!.activo) {
           @if (isLoggedIn()) {
-            <button class="btn btn-blue" (click)="solicitar()" [disabled]="enviando()">
-              @if (enviando()) {
-                <span class="spinner"></span> Enviando...
-              } @else {
-                Solicitar ingreso
-              }
-            </button>
+            @if (miSolicitud()?.estado === 'aprobada') {
+              <a class="btn btn-blue" routerLink="/panel-usuario">Ver mis clubes</a>
+            } @else if (!miSolicitud()) {
+              <button class="btn btn-blue" (click)="solicitar()" [disabled]="enviando()">
+                @if (enviando()) {
+                  <span class="spinner"></span> Enviando...
+                } @else {
+                  Solicitar ingreso
+                }
+              </button>
+            }
           } @else {
             <a class="btn btn-blue" routerLink="/login">Inicia sesión para solicitar</a>
           }

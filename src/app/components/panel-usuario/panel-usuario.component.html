@@ -82,14 +82,16 @@
 
   <div class="tabs" role="tablist" aria-label="Secciones del panel">
     @for (tab of tabsPanel; track tab.id) {
-      <button type="button"
-              role="tab"
-              class="tab-btn"
-              [class.active]="esTabActiva(tab.id)"
-              [attr.aria-selected]="esTabActiva(tab.id)"
-              (click)="cambiarTab(tab.id, $event)">
-        {{ tab.label }}
-      </button>
+      @if (!tab.adminOnly || esAdmin()) {
+        <button type="button"
+                role="tab"
+                class="tab-btn"
+                [class.active]="esTabActiva(tab.id)"
+                [attr.aria-selected]="esTabActiva(tab.id)"
+                (click)="cambiarTab(tab.id, $event)">
+          {{ tab.label }}
+        </button>
+      }
     }
   </div>
 
@@ -158,7 +160,7 @@
     </article>
   }
 
-  @if (tabActiva === 'admin-clubes') {
+  @if (tabActiva === 'admin-clubes' && esAdmin()) {
     <article class="card tab-content">
       <div class="tab-title-row">
         <h2>Gestión de clubes</h2>
@@ -264,7 +266,7 @@
     </article>
   }
 
-  @if (tabActiva === 'admin-eventos') {
+  @if (tabActiva === 'admin-eventos' && esAdmin()) {
     <article class="card tab-content">
       <div class="tab-title-row">
         <h2>Gestión de eventos</h2>
@@ -374,7 +376,7 @@
     </article>
   }
 
-  @if (tabActiva === 'admin-solicitudes') {
+  @if (tabActiva === 'admin-solicitudes' && esAdmin()) {
     <article class="card tab-content">
       <h2>Gestión de solicitudes</h2>
 

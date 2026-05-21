@@ -1,11 +1,13 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input, signal, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { switchMap, of } from 'rxjs';
+import { switchMap, of, combineLatest, map } from 'rxjs';
 import { ClubesService } from '../../services/clubes.service';
 import { SolicitudesService } from '../../services/solicitudes.service';
 import { EventosService } from '../../services/eventos.service';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../panel-usuario/user.service';
+import { Solicitud } from '../../models/solicitud.model';
 
 @Component({
   selector: 'app-detalle-club',
@@ -17,11 +19,12 @@ import { AuthService } from '../../services/auth.service';
 export class DetalleClubComponent {
   id = input<string>('');
 
-  private clubesService       = inject(ClubesService);
-  private solicitudesService  = inject(SolicitudesService);
-  private eventosService      = inject(EventosService);
-  private authService         = inject(AuthService);
-  private router              = inject(Router);
+  private clubesService      = inject(ClubesService);
+  private solicitudesService = inject(SolicitudesService);
+  private eventosService     = inject(EventosService);
+  private authService        = inject(AuthService);
+  private userService        = inject(UserService);
+  private router             = inject(Router);
 
   readonly club = toSignal(
     toObservable(this.id).pipe(
@@ -36,6 +39,41 @@ export class DetalleClubComponent {
     ),
     { initialValue: [] }
   );
+
+  readonly perfil = toSignal(
+    toObservable(this.authService.uid).pipe(
+      switchMap(uid => uid ? this.userService.getProfile(uid) : of(undefined))
+    )
+  );
+
+  readonly miSolicitud = toSignal(
+    combineLatest([
+      toObservable(this.id),
+      toObservable(this.authService.uid)
+    ]).pipe(
+      switchMap(([clubId, uid]) =>
+        uid && clubId
+          ? this.solicitudesService.getByUsuario(uid).pipe(
+              map(sols => sols.find(s => s.clubId === clubId) ?? null)
+            )
+          : of(null)
+      )
+    )
+  );
+
+  readonly esPrivilegiado = computed(() => {
+    const rol = this.perfil()?.rol;
+    return rol === 'Admin' || rol === 'Moderador';
+  });
+
+  readonly accesoPermitido = computed(() => {
+    if (!this.authService.isLoggedIn()) return true;
+    if (this.esPrivilegiado()) return true;
+    const sol = this.miSolicitud();
+    if (sol === undefined) return true;
+    if (sol === null) return true;
+    return sol.estado === 'aprobada';
+  });
 
   readonly mensajeAccion = signal('');
   readonly enviando      = signal(false);
@@ -60,15 +98,17 @@ export class DetalleClubComponent {
     const club = this.club();
     if (!club) return;
 
+    if (this.miSolicitud() != null) return;
+
     this.enviando.set(true);
     try {
       await this.solicitudesService.create({
-        usuarioId:    user.uid,
+        usuarioId:     user.uid,
         usuarioNombre: user.displayName ?? user.email ?? '',
-        usuarioEmail: user.email ?? '',
-        clubId:       club.id!,
-        clubNombre:   club.nombre,
-        estado:       'pendiente'
+        usuarioEmail:  user.email ?? '',
+        clubId:        club.id!,
+        clubNombre:    club.nombre,
+        estado:        'pendiente'
       });
       this.mensajeAccion.set('✅ Solicitud enviada correctamente');
     } catch {

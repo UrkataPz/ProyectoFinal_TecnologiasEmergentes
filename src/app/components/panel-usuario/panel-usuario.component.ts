@@ -40,7 +40,9 @@ export class PanelUsuarioComponent {
 
   readonly nombre = computed(() => this.perfil()?.nombre || this.authService.displayName() || this.authService.email());
   readonly inicialUsuario = computed(() => (this.nombre()?.trim().charAt(0) || 'U').toUpperCase());
-  readonly esAdmin = computed(() => this.perfil()?.rol === 'Admin');
+  readonly esAdmin = computed(() =>
+    this.perfil()?.rol === 'Admin' || this.perfil()?.rol === 'Moderador'
+  );
 
   readonly formPerfil = signal({ nombre: '', correo: '', carrera: '' });
 
@@ -85,12 +87,12 @@ export class PanelUsuarioComponent {
     this.misSolicitudes().filter(s => s.estado === 'aprobada').length
   );
 
-  readonly tabsPanel: { id: PanelTab; label: string }[] = [
-    { id: 'solicitudes',       label: 'Mis solicitudes' },
-    { id: 'clubes',            label: 'Directorio' },
-    { id: 'admin-clubes',      label: 'Gestión de clubes' },
-    { id: 'admin-eventos',     label: 'Gestión de eventos' },
-    { id: 'admin-solicitudes', label: 'Todas las solicitudes' }
+  readonly tabsPanel: { id: PanelTab; label: string; adminOnly: boolean }[] = [
+    { id: 'solicitudes',       label: 'Mis solicitudes',       adminOnly: false },
+    { id: 'clubes',            label: 'Directorio',            adminOnly: false },
+    { id: 'admin-clubes',      label: 'Gestión de clubes',     adminOnly: true  },
+    { id: 'admin-eventos',     label: 'Gestión de eventos',    adminOnly: true  },
+    { id: 'admin-solicitudes', label: 'Todas las solicitudes', adminOnly: true  }
   ];
 
   readonly todosEventos = toSignal(this.eventosService.getAll(), { initialValue: [] });

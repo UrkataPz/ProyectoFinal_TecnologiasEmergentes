@@ -37,6 +37,7 @@
       @for (club of clubesFiltrados(); track club.id) {
         <app-club-card
           [club]="club"
+          [estadoSolicitud]="solicitudesMapa()[club.id!] ?? null"
           (verDetalle)="irADetalle($event)"
           (solicitarIngreso)="solicitar($event)" />
       }
