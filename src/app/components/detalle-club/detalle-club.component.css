@@ -1,3 +1,32 @@
+.access-gate {
+  text-align: center;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.gate-icon {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+.access-gate h2 {
+  font-size: 1.4rem;
+  color: var(--primary-dark);
+  margin: 0;
+}
+
+.access-gate p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
 .detail-card h1 {
   font-size: clamp(1.4rem, 4vw, 2.6rem);
   margin: 10px 0 12px;

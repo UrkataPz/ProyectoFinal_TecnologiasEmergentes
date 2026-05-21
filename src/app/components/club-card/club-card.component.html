@@ -16,9 +16,17 @@
       <button class="btn btn-blue" (click)="verDetalle.emit(club().id!)">
         Ver detalle
       </button>
-      <button class="btn btn-light" (click)="solicitarIngreso.emit(club())">
-        Solicitar ingreso
-      </button>
+      @if (estadoSolicitud() === 'aprobada') {
+        <a class="btn btn-blue" routerLink="/panel-usuario">Ver mis clubes</a>
+      } @else if (estadoSolicitud() === 'pendiente') {
+        <span class="btn btn-light solicitud-estado">Solicitud pendiente</span>
+      } @else if (estadoSolicitud() === 'rechazada') {
+        <span class="btn btn-light solicitud-estado">Solicitud rechazada</span>
+      } @else {
+        <button class="btn btn-light" (click)="solicitarIngreso.emit(club())">
+          Solicitar ingreso
+        </button>
+      }
     </div>
   }
 </article>

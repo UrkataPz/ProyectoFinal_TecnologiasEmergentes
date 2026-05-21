@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { switchMap, of } from 'rxjs';
 import { ClubesService } from '../../services/clubes.service';
 import { SolicitudesService } from '../../services/solicitudes.service';
 import { AuthService } from '../../services/auth.service';
@@ -23,6 +24,21 @@ export class ClubesComponent {
   readonly clubes = toSignal(this.clubesService.getAll(), { initialValue: [] });
   readonly filtro = signal('');
   readonly mensajeAccion = signal('');
+
+  readonly misSolicitudes = toSignal(
+    toObservable(this.authService.uid).pipe(
+      switchMap(uid => uid ? this.solicitudesService.getByUsuario(uid) : of([]))
+    ),
+    { initialValue: [] }
+  );
+
+  readonly solicitudesMapa = computed(() => {
+    const mapa: Record<string, string | undefined> = {};
+    for (const s of this.misSolicitudes()) {
+      mapa[s.clubId] = s.estado;
+    }
+    return mapa;
+  });
 
   readonly clubesFiltrados = computed(() => {
     const termino = this.filtro().toLowerCase().trim();
@@ -47,6 +63,8 @@ export class ClubesComponent {
       this.router.navigate(['/login']);
       return;
     }
+
+    if (this.solicitudesMapa()[club.id!]) return;
 
     try {
       await this.solicitudesService.create({
