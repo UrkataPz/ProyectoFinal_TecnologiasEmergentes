@@ -93,7 +93,7 @@
         @if (club()!.activo) {
           @if (isLoggedIn()) {
             @if (miSolicitud()?.estado === 'aprobada') {
-              <a class="btn btn-blue" routerLink="/panel-usuario">Ver mis clubes</a>
+              <a class="btn btn-blue" [routerLink]="['/clubes', id(), 'feed']">Ir al club</a>
             } @else if (!miSolicitud()) {
               <button class="btn btn-blue" (click)="solicitar()" [disabled]="enviando()">
                 @if (enviando()) {

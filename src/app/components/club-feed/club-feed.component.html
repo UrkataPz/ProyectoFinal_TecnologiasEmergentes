@@ -1,0 +1,161 @@
+<section class="feed-page">
+
+  @if (!accesoPermitido() && miSolicitud() !== undefined) {
+    <div class="card" style="max-width:480px;margin:40px auto;text-align:center;padding:40px 24px">
+      <p style="margin-bottom:16px">No tienes acceso a este club.</p>
+      <a class="btn btn-light" routerLink="/clubes">Volver al directorio</a>
+    </div>
+
+  } @else {
+
+    <aside class="sidebar-left">
+      <div class="card sidebar-card">
+        <h2 class="sidebar-club-name">{{ club()?.nombre }}</h2>
+        <span class="badge" style="margin-bottom:16px">{{ club()?.categoria }}</span>
+
+        <nav class="cat-nav">
+          @for (cat of categorias; track cat) {
+            <button
+              type="button"
+              class="cat-btn"
+              [class.active]="categoriaActiva() === cat"
+              (click)="categoriaActiva.set(cat)">
+              {{ cat }}
+            </button>
+          }
+        </nav>
+
+        @if (proximosEventos().length > 0) {
+          <div class="sidebar-events">
+            <h3>Próximos eventos</h3>
+            @for (ev of proximosEventos(); track ev.id) {
+              <div class="sidebar-event">
+                <span class="ev-fecha">{{ ev.fecha }}</span>
+                <span class="ev-nombre">{{ ev.titulo }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </aside>
+
+    <main class="feed-main">
+      <div class="feed-topbar">
+        <a class="btn btn-light btn-sm" routerLink="/clubes">← Directorio</a>
+        <h1 class="feed-title">{{ club()?.nombre }}</h1>
+      </div>
+
+      <div class="cat-chips">
+        @for (cat of categorias; track cat) {
+          <button
+            type="button"
+            class="chip"
+            [class.active]="categoriaActiva() === cat"
+            (click)="categoriaActiva.set(cat)">
+            {{ cat }}
+          </button>
+        }
+      </div>
+
+      <div class="card composer">
+        <textarea
+          class="composer-input"
+          placeholder="¿Qué está pasando en el club?"
+          [value]="nuevoContenido()"
+          (input)="nuevoContenido.set($any($event.target).value)"
+          rows="3">
+        </textarea>
+        <div class="composer-footer">
+          <select
+            class="select-cat"
+            [value]="categoriaNuevo()"
+            (change)="categoriaNuevo.set($any($event.target).value)">
+            @for (cat of categoriasPost; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+          <button
+            type="button"
+            class="btn btn-blue"
+            (click)="publicar()"
+            [disabled]="publicando() || !nuevoContenido().trim()">
+            @if (publicando()) { Publicando... } @else { Publicar }
+          </button>
+        </div>
+      </div>
+
+      @if (postsFiltrados().length === 0) {
+        <div class="card empty-feed">
+          <p class="muted-msg">No hay publicaciones aquí todavía.</p>
+        </div>
+      } @else {
+        @for (post of postsFiltrados(); track post.id) {
+          <div class="card post-card">
+            <div class="post-header">
+              <div class="avatar" [style.background]="colorCategoria(post.categoria)">
+                {{ iniciales(post.autorNombre) }}
+              </div>
+              <div class="post-meta">
+                <strong>{{ post.autorNombre }}</strong>
+                <span class="post-time">{{ tiempoRelativo(post.creadoEn) }}</span>
+              </div>
+              <span
+                class="badge cat-badge"
+                [style.background]="colorCategoria(post.categoria) + '22'"
+                [style.color]="colorCategoria(post.categoria)">
+                {{ post.categoria }}
+              </span>
+              @if (puedeEliminar(post)) {
+                <button type="button" class="del-btn" (click)="eliminarPost(post.id!)">×</button>
+              }
+            </div>
+
+            <p class="post-body">{{ post.contenido }}</p>
+
+            <div class="post-actions">
+              <button
+                type="button"
+                class="like-btn"
+                [class.liked]="estaLikeado(post)"
+                (click)="toggleLike(post)">
+                ♥ {{ post.likes.length }}
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </main>
+
+    <aside class="sidebar-right">
+      <div class="card sidebar-card">
+        <h3>Estadísticas</h3>
+        <div class="stat-item">
+          <span class="stat-num">{{ club()?.miembros ?? 0 }}</span>
+          <span class="stat-label">Miembros activos</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">{{ eventos().length }}</span>
+          <span class="stat-label">Eventos del club</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">{{ posts().length }}</span>
+          <span class="stat-label">Publicaciones</span>
+        </div>
+      </div>
+
+      @if (proximosEventos().length > 0) {
+        <div class="card sidebar-card">
+          <h3>Próximos eventos</h3>
+          @for (ev of proximosEventos(); track ev.id) {
+            <div class="sidebar-event">
+              <span class="ev-fecha">{{ ev.fecha }}</span>
+              <span class="ev-nombre">{{ ev.titulo }}</span>
+              <span class="ev-lugar">{{ ev.lugar }}</span>
+            </div>
+          }
+        </div>
+      }
+    </aside>
+
+  }
+</section>

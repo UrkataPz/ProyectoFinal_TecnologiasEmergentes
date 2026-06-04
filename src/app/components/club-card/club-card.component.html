@@ -17,7 +17,7 @@
         Ver detalle
       </button>
       @if (estadoSolicitud() === 'aprobada') {
-        <a class="btn btn-blue" routerLink="/panel-usuario">Ver mis clubes</a>
+        <a class="btn btn-blue" [routerLink]="['/clubes', club().id!, 'feed']">Ir al club</a>
       } @else if (estadoSolicitud() === 'pendiente') {
         <span class="btn btn-light solicitud-estado">Solicitud pendiente</span>
       } @else if (estadoSolicitud() === 'rechazada') {
