@@ -8,6 +8,7 @@ export interface UserProfile {
   correo: string;
   carrera: string;
   rol: 'Estudiante' | 'Admin' | 'Moderador';
+  fotoUrl?: string | null;
 }
 
 @Injectable({

@@ -1,0 +1,38 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "notificaciones",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "usuarioId", "order": "ASCENDING" },
+        { "fieldPath": "creadaEn", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "eventos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "clubId", "order": "ASCENDING" },
+        { "fieldPath": "fecha", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "posts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "clubId", "order": "ASCENDING" },
+        { "fieldPath": "creadoEn", "order": "DESCENDING" }
+      ]
+    }
+  ],
+    {
+      "collectionGroup": "comments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "clubId", "order": "ASCENDING" },
+        { "fieldPath": "creadoEn", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

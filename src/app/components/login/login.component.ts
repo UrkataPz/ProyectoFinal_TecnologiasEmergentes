@@ -38,7 +38,7 @@ export class LoginComponent {
 
     if (result.success) {
       this.mensaje.set('✅ ' + result.message + '. Redirigiendo...');
-      setTimeout(() => this.router.navigate(['/panel-usuario']), 1500);
+      setTimeout(() => this.router.navigate(['/clubes']), 1500);
     } else {
       this.mensaje.set('❌ ' + result.message);
       this.isLoading.set(false);

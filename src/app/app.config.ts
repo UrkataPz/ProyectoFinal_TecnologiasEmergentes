@@ -3,7 +3,8 @@ import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore'; // ← Importante para guardar datos
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideStorage, getStorage } from '@angular/fire/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCvweCtB2eMBeny1f5hNElBnB5CQnJvSKY",
@@ -20,6 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
     provideAuth(() => getAuth()),
-    provideFirestore(() => getFirestore()) 
+    provideFirestore(() => getFirestore()),
+    provideStorage(() => getStorage())
   ]
 };

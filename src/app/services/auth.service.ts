@@ -17,8 +17,9 @@ export class AuthService {
   readonly currentUser = toSignal(authState(this.auth), { initialValue: null });
   readonly isLoggedIn = computed(() => this.currentUser() !== null);
   readonly displayName = computed(() => this.currentUser()?.displayName ?? '');
-  readonly email = computed(() => this.currentUser()?.email ?? '');
-  readonly uid = computed(() => this.currentUser()?.uid ?? '');
+  readonly email      = computed(() => this.currentUser()?.email ?? '');
+  readonly uid        = computed(() => this.currentUser()?.uid ?? '');
+  readonly photoURL   = computed(() => this.currentUser()?.photoURL ?? null);
 
   async login(email: string, password: string): Promise<{ success: boolean; message: string }> {
     try {

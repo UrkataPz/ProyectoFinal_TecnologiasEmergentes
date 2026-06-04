@@ -19,6 +19,7 @@ export class NavbarComponent {
 
   readonly isLoggedIn  = this.authService.isLoggedIn;
   readonly displayName = this.authService.displayName;
+  readonly photoURL    = this.authService.photoURL;
 
   menuAbierto   = signal(false);
   notifAbiertas = signal(false);
