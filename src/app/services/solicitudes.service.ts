@@ -12,8 +12,8 @@ import {
   where,
   orderBy
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { Solicitud } from '../models/solicitud.model';
 
 @Injectable({ providedIn: 'root' })
@@ -21,6 +21,20 @@ export class SolicitudesService {
   private firestore = inject(Firestore);
   private injector = inject(Injector);
   private colRef = collection(this.firestore, 'solicitudes');
+
+  getByClub(clubId: string): Observable<Solicitud[]> {
+    const q = query(this.colRef, where('clubId', '==', clubId));
+    return runInInjectionContext(
+      this.injector,
+      () => collectionData(q, { idField: 'id' }) as Observable<Solicitud[]>
+    ).pipe(
+      map(sols => sols.filter(s => s.estado === 'aprobada')),
+      catchError(err => {
+        console.error('[getByClub]', clubId, err);
+        return of([]);
+      })
+    );
+  }
 
   getAll(): Observable<Solicitud[]> {
     const q = query(this.colRef, orderBy('fechaSolicitud', 'desc'));

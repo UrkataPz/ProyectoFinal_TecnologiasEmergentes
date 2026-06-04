@@ -70,7 +70,12 @@
       <a routerLink="/clubes" routerLinkActive="active" (click)="cerrarMenu()">Clubes</a>
 
       @if (isLoggedIn()) {
-        <a routerLink="/panel-usuario" routerLinkActive="active" (click)="cerrarMenu()">
+        <a routerLink="/panel-usuario" routerLinkActive="active" (click)="cerrarMenu()" class="nav-user-link">
+          @if (photoURL()) {
+            <img class="nav-avatar" [src]="photoURL()!" [alt]="displayName()">
+          } @else {
+            <span class="nav-initial">{{ (displayName() || 'U')[0].toUpperCase() }}</span>
+          }
           {{ displayName() || 'Panel' }}
         </a>
 

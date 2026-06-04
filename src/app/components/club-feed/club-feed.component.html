@@ -1,8 +1,8 @@
 <section class="feed-page">
 
   @if (!accesoPermitido() && miSolicitud() !== undefined) {
-    <div class="card" style="max-width:480px;margin:40px auto;text-align:center;padding:40px 24px">
-      <p style="margin-bottom:16px">No tienes acceso a este club.</p>
+    <div class="card access-denied">
+      <p>No tienes acceso a este club.</p>
       <a class="btn btn-light" routerLink="/clubes">Volver al directorio</a>
     </div>
 
@@ -11,25 +11,35 @@
     <aside class="sidebar-left">
       <div class="card sidebar-card">
         <h2 class="sidebar-club-name">{{ club()?.nombre }}</h2>
-        <span class="badge" style="margin-bottom:16px">{{ club()?.categoria }}</span>
+        <span class="badge" style="align-self:flex-start;margin-bottom:16px">{{ club()?.categoria }}</span>
 
-        <nav class="cat-nav">
-          @for (cat of categorias; track cat) {
-            <button
-              type="button"
-              class="cat-btn"
-              [class.active]="categoriaActiva() === cat"
-              (click)="categoriaActiva.set(cat)">
-              {{ cat }}
-            </button>
-          }
+        <nav class="sidebar-nav">
+          <button type="button" class="nav-btn" [class.active]="vistaActiva() === 'inicio'"
+            (click)="vistaActiva.set('inicio')">🏠 Inicio</button>
+          <button type="button" class="nav-btn" [class.active]="vistaActiva() === 'miembros'"
+            (click)="vistaActiva.set('miembros')">👥 Miembros</button>
+          <button type="button" class="nav-btn" [class.active]="vistaActiva() === 'eventos'"
+            (click)="vistaActiva.set('eventos')">📅 Eventos</button>
         </nav>
+
+        @if (vistaActiva() === 'inicio') {
+          <div class="cat-section">
+            <p class="section-label">Categorías</p>
+            @for (cat of categorias; track cat) {
+              <button type="button" class="cat-btn"
+                [class.active]="categoriaActiva() === cat"
+                (click)="categoriaActiva.set(cat)">
+                {{ cat }}
+              </button>
+            }
+          </div>
+        }
 
         @if (proximosEventos().length > 0) {
           <div class="sidebar-events">
-            <h3>Próximos eventos</h3>
+            <p class="section-label">Próximos eventos</p>
             @for (ev of proximosEventos(); track ev.id) {
-              <div class="sidebar-event">
+              <div class="sidebar-event" (click)="vistaActiva.set('eventos')">
                 <span class="ev-fecha">{{ ev.fecha }}</span>
                 <span class="ev-nombre">{{ ev.titulo }}</span>
               </div>
@@ -45,92 +55,369 @@
         <h1 class="feed-title">{{ club()?.nombre }}</h1>
       </div>
 
-      <div class="cat-chips">
-        @for (cat of categorias; track cat) {
-          <button
-            type="button"
-            class="chip"
-            [class.active]="categoriaActiva() === cat"
-            (click)="categoriaActiva.set(cat)">
-            {{ cat }}
-          </button>
-        }
-      </div>
+      <nav class="mobile-nav">
+        <button type="button" class="nav-btn" [class.active]="vistaActiva() === 'inicio'"
+          (click)="vistaActiva.set('inicio')">🏠 Inicio</button>
+        <button type="button" class="nav-btn" [class.active]="vistaActiva() === 'miembros'"
+          (click)="vistaActiva.set('miembros')">👥 Miembros</button>
+        <button type="button" class="nav-btn" [class.active]="vistaActiva() === 'eventos'"
+          (click)="vistaActiva.set('eventos')">📅 Eventos</button>
+      </nav>
 
-      <div class="card composer">
-        <textarea
-          class="composer-input"
-          placeholder="¿Qué está pasando en el club?"
-          [value]="nuevoContenido()"
-          (input)="nuevoContenido.set($any($event.target).value)"
-          rows="3">
-        </textarea>
-        <div class="composer-footer">
-          <select
-            class="select-cat"
-            [value]="categoriaNuevo()"
-            (change)="categoriaNuevo.set($any($event.target).value)">
-            @for (cat of categoriasPost; track cat) {
-              <option [value]="cat">{{ cat }}</option>
-            }
-          </select>
-          <button
-            type="button"
-            class="btn btn-blue"
-            (click)="publicar()"
-            [disabled]="publicando() || !nuevoContenido().trim()">
-            @if (publicando()) { Publicando... } @else { Publicar }
-          </button>
-        </div>
-      </div>
+      @if (vistaActiva() === 'inicio') {
 
-      @if (postsFiltrados().length === 0) {
-        <div class="card empty-feed">
-          <p class="muted-msg">No hay publicaciones aquí todavía.</p>
+        <div class="cat-chips">
+          @for (cat of categorias; track cat) {
+            <button type="button" class="chip" [class.active]="categoriaActiva() === cat"
+              (click)="categoriaActiva.set(cat)">{{ cat }}</button>
+          }
         </div>
-      } @else {
-        @for (post of postsFiltrados(); track post.id) {
-          <div class="card post-card">
-            <div class="post-header">
-              <div class="avatar" [style.background]="colorCategoria(post.categoria)">
-                {{ iniciales(post.autorNombre) }}
+
+        <div class="card composer">
+          <textarea class="composer-input"
+            placeholder="¿Qué está pasando en el club?"
+            [value]="nuevoContenido()"
+            (input)="nuevoContenido.set($any($event.target).value)"
+            rows="3"></textarea>
+          <div class="composer-footer">
+            <select class="select-cat" [value]="categoriaNuevo()"
+              (change)="categoriaNuevo.set($any($event.target).value)">
+              @for (cat of categoriasPost; track cat) {
+                <option [value]="cat">{{ cat }}</option>
+              }
+            </select>
+            <button type="button" class="btn btn-blue"
+              (click)="publicar()"
+              [disabled]="publicando() || !nuevoContenido().trim()">
+              @if (publicando()) { Publicando... } @else { Publicar }
+            </button>
+          </div>
+        </div>
+
+        @if (postsFiltrados().length === 0) {
+          <div class="card empty-state"><p class="muted-msg">No hay publicaciones aquí todavía.</p></div>
+        } @else {
+          @for (post of postsFiltrados(); track post.id) {
+            <div class="card post-card">
+              <div class="post-header">
+                <div class="avatar" [style.background]="colorAvatar(post.autorNombre)">
+                  {{ iniciales(post.autorNombre) }}
+                </div>
+                <div class="post-meta">
+                  <div class="meta-nombre">
+                    <strong>{{ post.autorNombre }}</strong>
+                    @if (post.autorRolClub) {
+                      <span class="badge badge-directiva"
+                        [style.background]="colorRolClub(post.autorRolClub) + '18'"
+                        [style.color]="colorRolClub(post.autorRolClub)"
+                        [style.border]="'1px solid ' + colorRolClub(post.autorRolClub) + '44'">
+                        {{ post.autorRolClub }}
+                      </span>
+                    }
+                  </div>
+                  <span class="post-time">{{ tiempoRelativo(post.creadoEn) }}</span>
+                </div>
+                <span class="badge cat-badge"
+                  [style.background]="colorCategoria(post.categoria) + '22'"
+                  [style.color]="colorCategoria(post.categoria)">
+                  {{ post.categoria }}
+                </span>
+                @if (puedeEliminar(post)) {
+                  <button type="button" class="del-btn" (click)="eliminarPost(post.id!)">×</button>
+                }
               </div>
-              <div class="post-meta">
-                <strong>{{ post.autorNombre }}</strong>
-                <span class="post-time">{{ tiempoRelativo(post.creadoEn) }}</span>
+
+              <p class="post-body">{{ post.contenido }}</p>
+
+              <div class="post-actions">
+                <button type="button" class="like-btn"
+                  [class.liked]="estaLikeado(post)"
+                  (click)="toggleLike(post)">
+                  ♥ {{ post.likes.length }}
+                </button>
+                <button type="button" class="comment-toggle-btn"
+                  [class.active]="postExpandido() === post.id"
+                  (click)="toggleComentarios(post.id!)">
+                  💬 {{ (comentariosAgrupados()[post.id!] ?? []).length }}
+                </button>
               </div>
-              <span
-                class="badge cat-badge"
-                [style.background]="colorCategoria(post.categoria) + '22'"
-                [style.color]="colorCategoria(post.categoria)">
-                {{ post.categoria }}
-              </span>
-              @if (puedeEliminar(post)) {
-                <button type="button" class="del-btn" (click)="eliminarPost(post.id!)">×</button>
+
+              @if (postExpandido() === post.id) {
+                <div class="comentarios-section">
+                  @for (c of (comentariosAgrupados()[post.id!] ?? []); track c.id) {
+                    <div class="comentario-item">
+                      <div class="comentario-header">
+                        <div class="avatar avatar-xs" [style.background]="colorAvatar(c.autorNombre)">
+                          {{ iniciales(c.autorNombre) }}
+                        </div>
+                        <div class="comentario-meta">
+                          <div class="meta-nombre">
+                            <strong>{{ c.autorNombre }}</strong>
+                            @if (c.autorRolClub) {
+                              <span class="badge badge-directiva badge-xs"
+                                [style.background]="colorRolClub(c.autorRolClub) + '18'"
+                                [style.color]="colorRolClub(c.autorRolClub)"
+                                [style.border]="'1px solid ' + colorRolClub(c.autorRolClub) + '44'">
+                                {{ c.autorRolClub }}
+                              </span>
+                            }
+                          </div>
+                          <span class="post-time">{{ tiempoRelativo(c.creadoEn) }}</span>
+                        </div>
+                        @if (puedeEliminarComentario(c)) {
+                          <button type="button" class="del-btn" (click)="eliminarComentario(c.id!)">×</button>
+                        }
+                      </div>
+                      <p class="comentario-body">{{ c.contenido }}</p>
+                    </div>
+                  }
+
+                  <div class="comentario-form">
+                    <input type="text" class="comentario-input"
+                      placeholder="Escribe un comentario..."
+                      [value]="getTextoComentario(post.id!)"
+                      (input)="setTextoComentario(post.id!, $any($event.target).value)"
+                      (keydown.enter)="publicarComentario(post.id!)">
+                    <button type="button" class="btn btn-blue btn-sm"
+                      (click)="publicarComentario(post.id!)"
+                      [disabled]="enviandoComentario() || !getTextoComentario(post.id!).trim()">
+                      Enviar
+                    </button>
+                  </div>
+                </div>
               }
             </div>
+          }
+        }
 
-            <p class="post-body">{{ post.contenido }}</p>
+      } @else if (vistaActiva() === 'miembros') {
 
-            <div class="post-actions">
-              <button
-                type="button"
-                class="like-btn"
-                [class.liked]="estaLikeado(post)"
-                (click)="toggleLike(post)">
-                ♥ {{ post.likes.length }}
-              </button>
-            </div>
+        <div class="vista-header">
+          <h2>Miembros del club</h2>
+          <span class="muted-msg">{{ miembrosClub().length }} miembro{{ miembrosClub().length !== 1 ? 's' : '' }}</span>
+        </div>
+
+        @if (miembrosClub().length === 0) {
+          <div class="card empty-state">
+            <p class="muted-msg">Ningún miembro aprobado en este club todavía.</p>
+            @if (esModerador()) {
+              <p style="font-size:0.82rem;color:var(--muted);margin-top:8px;line-height:1.5">
+                Para que aparezcan aquí: un estudiante debe solicitar ingreso y tú debes aprobarlo en
+                <a routerLink="/panel-usuario" style="color:var(--primary);font-weight:600">
+                  Panel → Todas las solicitudes
+                </a>.
+              </p>
+            }
+          </div>
+        } @else {
+          <div class="miembros-list">
+            @for (m of miembrosClub(); track m.id) {
+              <div class="card miembro-card">
+                <div class="miembro-fila">
+                  <div class="avatar" [style.background]="colorAvatar(m.usuarioNombre)">
+                    {{ iniciales(m.usuarioNombre) }}
+                  </div>
+                  <div class="miembro-info">
+                    <strong>{{ m.usuarioNombre }}</strong>
+                    <span class="muted-msg">{{ m.usuarioEmail }}</span>
+                  </div>
+                  <div class="miembro-badges">
+                    @if (m.rolClub) {
+                      <span class="badge badge-rol"
+                        [style.background]="colorRolClub(m.rolClub) + '18'"
+                        [style.color]="colorRolClub(m.rolClub)"
+                        [style.border]="'1px solid ' + colorRolClub(m.rolClub) + '44'">
+                        {{ m.rolClub }}
+                      </span>
+                    }
+                    @if (m.esModeradorClub) {
+                      <span class="badge badge-mod">Moderador</span>
+                    }
+                  </div>
+                </div>
+
+                @if (esPrivilegiado()) {
+                  <div class="miembro-acciones">
+                    <div class="accion-grupo">
+                      <label class="select-label">Cargo en directiva</label>
+                      <select class="select-rol"
+                        [value]="m.rolClub ?? ''"
+                        (change)="asignarRol(m.id!, $any($event.target).value)">
+                        <option value="">Sin cargo</option>
+                        <option value="Presidente">Presidente</option>
+                        <option value="Vicepresidente">Vicepresidente</option>
+                        <option value="Secretario">Secretario</option>
+                        <option value="Tesorero">Tesorero</option>
+                      </select>
+                    </div>
+                    <div class="accion-grupo">
+                      <label class="select-label">Permisos de club</label>
+                      <button type="button"
+                        class="btn btn-sm mod-toggle"
+                        [class.mod-activo]="m.esModeradorClub"
+                        (click)="toggleModerador(m.id!, m.esModeradorClub)">
+                        @if (m.esModeradorClub) { ✓ Moderador } @else { + Moderador }
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
           </div>
         }
+
+      } @else if (vistaActiva() === 'eventos') {
+
+        <div class="vista-header">
+          <h2>Eventos del club</h2>
+          @if (esModerador()) {
+            <button type="button" class="btn btn-blue btn-sm"
+              (click)="mostrarFormEvento.set(!mostrarFormEvento())">
+              {{ mostrarFormEvento() ? 'Cancelar' : '+ Crear evento' }}
+            </button>
+          }
+        </div>
+
+        @if (mostrarFormEvento()) {
+          <div class="card form-evento">
+            <h3>Nuevo evento</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Título</label>
+                <input type="text" class="input" placeholder="Nombre del evento"
+                  [value]="evTitulo()" (input)="evTitulo.set($any($event.target).value)">
+              </div>
+              <div class="form-group">
+                <label>Lugar</label>
+                <input type="text" class="input" placeholder="Auditorio, Lab..."
+                  [value]="evLugar()" (input)="evLugar.set($any($event.target).value)">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Fecha</label>
+                <input type="date" class="input"
+                  [value]="evFecha()" (input)="evFecha.set($any($event.target).value)">
+              </div>
+              <div class="form-group">
+                <label>Hora</label>
+                <input type="time" class="input"
+                  [value]="evHora()" (input)="evHora.set($any($event.target).value)">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Descripción</label>
+              <textarea class="input" rows="2" placeholder="Detalles del evento..."
+                [value]="evDescripcion()" (input)="evDescripcion.set($any($event.target).value)"></textarea>
+            </div>
+            <button type="button" class="btn btn-blue"
+              (click)="crearEvento()"
+              [disabled]="guardandoEvento() || !evTitulo().trim() || !evFecha()">
+              @if (guardandoEvento()) { Guardando... } @else { Guardar evento }
+            </button>
+          </div>
+        }
+
+        <div class="card calendar-card">
+          <div class="cal-header">
+            <button type="button" class="cal-nav-btn" (click)="prevMes()">‹</button>
+            <h3>{{ MESES[calMonth()] }} {{ calYear() }}</h3>
+            <button type="button" class="cal-nav-btn" (click)="nextMes()">›</button>
+          </div>
+
+          <div class="cal-grid">
+            @for (d of DIAS_SEM; track d) {
+              <div class="cal-day-name">{{ d }}</div>
+            }
+            @for (day of diasCalendario(); track day.iso) {
+              <button type="button"
+                class="cal-day"
+                [class.other-month]="!day.enMesActual"
+                [class.has-events]="day.eventos.length > 0"
+                [class.selected]="diaSeleccionado() === day.iso"
+                [class.today]="esHoy(day.date)"
+                (click)="seleccionarDia(day.iso)">
+                {{ day.date.getDate() }}
+                @if (day.eventos.length > 0) {
+                  <span class="ev-dot"></span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (diaSeleccionado()) {
+          <div class="dia-eventos">
+            <p class="section-label">{{ diaSeleccionado() }}</p>
+            @if (eventosDelDia().length === 0) {
+              <p class="muted-msg">Sin eventos este día.</p>
+            } @else {
+              @for (ev of eventosDelDia(); track ev.id) {
+                <div class="card evento-item">
+                  <div class="evento-item-header">
+                    <strong>{{ ev.titulo }}</strong>
+                    <span class="ev-fecha">{{ formatearFechaEvento(ev.fecha, ev.hora) }}</span>
+                  </div>
+                  <p>{{ ev.descripcion }}</p>
+                  <span class="ev-lugar">📍 {{ ev.lugar }}</span>
+                </div>
+              }
+            }
+          </div>
+        } @else {
+          <div class="eventos-lista">
+            <p class="section-label">Todos los eventos</p>
+            @if (eventos().length === 0) {
+              <p class="muted-msg">Sin eventos programados.</p>
+            } @else {
+              @for (ev of eventos(); track ev.id) {
+                @if (ev.activo) {
+                  <div class="card evento-item"
+                    (click)="seleccionarDia(ev.fecha); calYear.set(+ev.fecha.slice(0,4)); calMonth.set(+ev.fecha.slice(5,7) - 1)">
+                    <div class="evento-item-header">
+                      <strong>{{ ev.titulo }}</strong>
+                      <span class="ev-fecha">{{ formatearFechaEvento(ev.fecha, ev.hora) }}</span>
+                    </div>
+                    <p>{{ ev.descripcion }}</p>
+                    <span class="ev-lugar">📍 {{ ev.lugar }}</span>
+                  </div>
+                }
+              }
+            }
+          </div>
+        }
+
       }
     </main>
 
     <aside class="sidebar-right">
       <div class="card sidebar-card">
-        <h3>Estadísticas</h3>
+        <h3 class="sidebar-section-title">Mesa Directiva</h3>
+        @for (item of mesaDirectiva(); track item.rol) {
+          <div class="directiva-item">
+            @if (item.miembro) {
+              <div class="avatar avatar-sm" [style.background]="colorAvatar(item.miembro.usuarioNombre)">
+                {{ iniciales(item.miembro.usuarioNombre) }}
+              </div>
+              <div class="directiva-info">
+                <span class="directiva-rol">{{ item.icono }} {{ item.rol }}</span>
+                <strong>{{ item.miembro.usuarioNombre }}</strong>
+              </div>
+            } @else {
+              <div class="avatar avatar-sm avatar-empty">?</div>
+              <div class="directiva-info">
+                <span class="directiva-rol">{{ item.icono }} {{ item.rol }}</span>
+                <span class="muted-msg">Sin asignar</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="card sidebar-card">
+        <h3 class="sidebar-section-title">Estadísticas</h3>
         <div class="stat-item">
-          <span class="stat-num">{{ club()?.miembros ?? 0 }}</span>
+          <span class="stat-num">{{ miembrosClub().length }}</span>
           <span class="stat-label">Miembros activos</span>
         </div>
         <div class="stat-item">
@@ -142,19 +429,6 @@
           <span class="stat-label">Publicaciones</span>
         </div>
       </div>
-
-      @if (proximosEventos().length > 0) {
-        <div class="card sidebar-card">
-          <h3>Próximos eventos</h3>
-          @for (ev of proximosEventos(); track ev.id) {
-            <div class="sidebar-event">
-              <span class="ev-fecha">{{ ev.fecha }}</span>
-              <span class="ev-nombre">{{ ev.titulo }}</span>
-              <span class="ev-lugar">{{ ev.lugar }}</span>
-            </div>
-          }
-        </div>
-      }
     </aside>
 
   }

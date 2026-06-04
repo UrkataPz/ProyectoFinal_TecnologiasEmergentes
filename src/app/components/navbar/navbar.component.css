@@ -95,6 +95,35 @@
   font-size: 0.9rem;
   transition: background 0.15s;
 }
+
+.nav-user-link {
+  display: flex !important;
+  align-items: center;
+  gap: 7px;
+}
+
+.nav-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.5);
+  flex-shrink: 0;
+}
+
+.nav-initial {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
 .nav-links a:hover,
 .nav-links a.active {
   background: rgba(255,255,255,0.15);

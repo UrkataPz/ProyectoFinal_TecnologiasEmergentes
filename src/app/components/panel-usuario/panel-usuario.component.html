@@ -17,14 +17,28 @@
   <div class="grid grid-2 mb" style="margin-bottom: 2rem; gap: 20px;">
 
     <article class="card" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 2rem;">
-      <div class="profile-circle">
-        <span>{{ inicialUsuario() }}</span>
+      <div class="profile-photo-wrap">
+        @if (perfil()?.fotoUrl) {
+          <img class="profile-photo" [src]="perfil()!.fotoUrl!" [alt]="nombre()">
+        } @else {
+          <div class="profile-circle">
+            <span>{{ inicialUsuario() }}</span>
+          </div>
+        }
+        <label class="foto-btn" [class.uploading]="subiendoFoto()">
+          @if (subiendoFoto()) { Subiendo... } @else { 📷 Cambiar foto }
+          <input type="file" accept="image/*" style="display:none"
+            (change)="onFotoSeleccionada($event)" [disabled]="subiendoFoto()">
+        </label>
+        @if (fotoMensaje()) {
+          <p class="foto-msg">{{ fotoMensaje() }}</p>
+        }
       </div>
       <h2 style="margin: 0;">{{ nombre() }}</h2>
       <span class="badge" style="margin-top: 0.5rem;">{{ perfil()?.rol || 'Estudiante' }}</span>
       <div style="margin-top: 1.5rem; text-align: left; width: 100%;">
-        <p><strong>Correo:</strong> {{ perfil()?.correo || authService.email() }} </p>
-        <p><strong>Carrera:</strong> {{ perfil()?.carrera || 'No especificada' }} </p>
+        <p><strong>Correo:</strong> {{ perfil()?.correo || authService.email() }}</p>
+        <p><strong>Carrera:</strong> {{ perfil()?.carrera || 'No especificada' }}</p>
       </div>
     </article>
 
