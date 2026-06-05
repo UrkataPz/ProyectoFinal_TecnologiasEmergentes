@@ -1,12 +1,11 @@
-<section class="page">
-  <!-- Hero -->
-  <div class="hero">
-    <div>
+<section class="page inicio-page">
+  <header class="hero">
+    <div class="hero-content">
       <span class="badge">Plataforma universitaria</span>
-      <h1>Descubre los clubes de CEUTEC</h1>
+      <h1>Encuentra tu comunidad dentro de CEUTEC</h1>
       <p>
-        Consulta las organizaciones estudiantiles disponibles, conoce sus objetivos
-        y solicita tu ingreso desde un solo lugar.
+        Participa en clubes de tecnología, deportes, cultura, liderazgo y más.
+        Desarrolla habilidades, crea contactos y vive la experiencia universitaria al máximo.
       </p>
       <div class="actions">
         <a class="btn btn-primary" routerLink="/clubes">Ver clubes</a>
@@ -14,54 +13,155 @@
       </div>
     </div>
 
-    <aside class="hero-card">
+    <aside class="hero-card" aria-label="Resumen de la plataforma">
       <strong>CEUTEC</strong>
       <p>Plataforma de gestión de clubes y organizaciones estudiantiles universitarias.</p>
     </aside>
-  </div>
+  </header>
 
-  <!-- Stats -->
-  <div class="grid grid-3 stats">
+  <section class="carousel-section" aria-labelledby="carousel-title">
+    <div class="section-title compact">
+      <h2 id="carousel-title">Vive la comunidad estudiantil</h2>
+    </div>
+
+    <div class="carousel" aria-label="Carrusel de imágenes destacadas">
+      <div class="carousel-track">
+        @for (slide of carouselSlides(); track slide.titulo) {
+          <article class="carousel-slide">
+            @if (slide.imageUrl) {
+              <img [src]="slide.imageUrl" [alt]="slide.titulo">
+            } @else {
+              <div class="carousel-placeholder" aria-hidden="true">
+                <span>{{ slide.titulo }}</span>
+              </div>
+            }
+            <div class="carousel-caption">
+              <h3>{{ slide.titulo }}</h3>
+              <p>{{ slide.texto }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="search-section card" aria-labelledby="buscar-clubes-title">
+    <div>
+      <h2 id="buscar-clubes-title">Buscar clubes</h2>
+      <p>Encuentra opciones por nombre, categoría o descripción.</p>
+    </div>
+
+    <div class="search-field">
+      <label for="buscar-club">Buscar club</label>
+      <input
+        id="buscar-club"
+        type="search"
+        placeholder="Buscar club..."
+        [value]="filtro()"
+        (input)="filtro.set($any($event.target).value)"
+        autocomplete="off">
+      <span class="search-count" aria-live="polite">
+        {{ clubesFiltrados().length }} resultado{{ clubesFiltrados().length !== 1 ? 's' : '' }}
+      </span>
+    </div>
+  </section>
+
+  <section class="grid grid-3 stats" aria-label="Métricas de clubes">
     @for (item of resumenes(); track item.titulo) {
       <article class="card">
         <span class="badge">{{ item.valor }}</span>
-        <h3>{{ item.titulo }}</h3>
+        <h2>{{ item.titulo }}</h2>
         <p>{{ item.texto }}</p>
       </article>
     }
-  </div>
+  </section>
 
-  <!-- Cómo funciona -->
-  <div class="section-title mt">
-    <h2>¿Cómo funciona?</h2>
-  </div>
+  <section class="mt" aria-labelledby="destacados-title">
+    <div class="section-title">
+      <h2 id="destacados-title">Clubes Destacados</h2>
+      <p>Los clubes con mayor participación estudiantil aparecen primero.</p>
+    </div>
 
-  <div class="grid grid-3">
-    @for (paso of pasos(); track paso.num) {
-      <article class="card paso-card">
-        <span class="paso-num">{{ paso.num }}</span>
-        <h3>{{ paso.titulo }}</h3>
-        <p>{{ paso.desc }}</p>
+    @if (clubesDestacados().length === 0) {
+      <article class="card empty-state">
+        <p>Cargando clubes destacados...</p>
       </article>
+    } @else {
+      <div class="grid grid-3 featured-grid">
+        @for (club of clubesDestacados(); track club.id ?? club.nombre) {
+          <article class="card featured-card">
+            <div class="club-media">
+              @if (imagenClub(club)) {
+                <img [src]="imagenClub(club)" [alt]="'Imagen de ' + club.nombre">
+              } @else {
+                <span aria-hidden="true">{{ club.nombre.charAt(0) }}</span>
+              }
+            </div>
+            <div class="topline">
+              <span class="badge">{{ club.categoria }}</span>
+              <span class="members">{{ club.miembros }} miembros</span>
+            </div>
+            <h3>{{ club.nombre }}</h3>
+            <p>{{ club.descripcion }}</p>
+            <a class="btn btn-light" [routerLink]="['/clubes', club.id]">Ver más</a>
+          </article>
+        }
+      </div>
     }
-  </div>
+  </section>
 
-  <!-- CTA -->
-  <div class="grid grid-2 mt">
-    <article class="card">
-      <h2>Problema identificado</h2>
-      <p>
-        Muchos estudiantes no conocen qué clubes existen, quiénes los integran
-        ni cómo pueden formar parte de ellos.
-      </p>
-    </article>
+  @if (filtro()) {
+    <section class="mt" aria-labelledby="resultados-title">
+      <div class="section-title">
+        <h2 id="resultados-title">Resultados de búsqueda</h2>
+      </div>
+
+      @if (clubesFiltrados().length === 0) {
+        <article class="card empty-state">
+          <p>No se encontraron clubes con ese criterio.</p>
+        </article>
+      } @else {
+        <div class="grid grid-3 featured-grid">
+          @for (club of clubesFiltrados(); track club.id ?? club.nombre) {
+            <article class="card featured-card">
+              <div class="topline">
+                <span class="badge">{{ club.categoria }}</span>
+                <span class="members">{{ club.miembros }} miembros</span>
+              </div>
+              <h3>{{ club.nombre }}</h3>
+              <p>{{ club.descripcion }}</p>
+              <a class="btn btn-light" [routerLink]="['/clubes', club.id]">Ver más</a>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <section class="mt" aria-labelledby="beneficios-title">
+    <div class="section-title">
+      <h2 id="beneficios-title">¿Por qué unirte?</h2>
+      <p>Participar en un club te ayuda a crecer dentro y fuera del aula.</p>
+    </div>
+
+    <div class="benefits-grid">
+      @for (beneficio of beneficios(); track beneficio.titulo) {
+        <article class="card benefit-card">
+          <span class="benefit-icon" aria-hidden="true">{{ beneficio.icono }}</span>
+          <h3>{{ beneficio.titulo }}</h3>
+          <p>{{ beneficio.desc }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="mt cta-section" aria-labelledby="cta-title">
     <article class="card cta-card">
-      <h2>¿Listo para unirte?</h2>
-      <p>Crea tu cuenta gratis y empieza a explorar los clubes disponibles.</p>
+      <h2 id="cta-title">Comienza hoy</h2>
+      <p>Explora los clubes disponibles y forma parte de la comunidad estudiantil de CEUTEC.</p>
       <div class="actions">
-        <a class="btn btn-blue" routerLink="/registro">Registrarse</a>
-        <a class="btn btn-light" routerLink="/login">Iniciar sesión</a>
+        <a class="btn btn-blue" routerLink="/clubes">Explorar clubes</a>
       </div>
     </article>
-  </div>
+  </section>
 </section>

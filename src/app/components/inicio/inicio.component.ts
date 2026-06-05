@@ -1,5 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Club } from '../../models/club.model';
+import { ClubesService } from '../../services/clubes.service';
 
 @Component({
   selector: 'app-inicio',
@@ -9,15 +12,95 @@ import { RouterLink } from '@angular/router';
   styleUrl: './inicio.component.css'
 })
 export class InicioComponent {
-  readonly resumenes = signal([
-    { titulo: 'Clubes registrados', valor: '6+', texto: 'Directorio de organizaciones estudiantiles activas.' },
-    { titulo: 'Categorías',         valor: '7',  texto: 'Tecnología, deportes, cultura, arte y más.' },
-    { titulo: 'Estudiantes',        valor: '∞',  texto: 'Cualquier estudiante puede solicitar su ingreso.' }
+  private clubesService = inject(ClubesService);
+
+  readonly clubes = toSignal(this.clubesService.getAll(), { initialValue: [] });
+  readonly filtro = signal('');
+
+  readonly clubesActivos = computed(() =>
+    this.clubes().filter(club => club.activo)
+  );
+
+  readonly resumenes = computed(() => {
+    const activos = this.clubesActivos();
+    const categorias = new Set(
+      activos
+        .map(club => club.categoria?.trim())
+        .filter((categoria): categoria is string => Boolean(categoria))
+    );
+    const miembros = activos.reduce((total, club) => total + (Number(club.miembros) || 0), 0);
+
+    return [
+      { titulo: 'Clubes activos', valor: `${activos.length}`, texto: 'Organizaciones estudiantiles disponibles.' },
+      { titulo: 'Categorías disponibles', valor: `${categorias.size}`, texto: 'Tecnología, deportes, cultura, liderazgo y más.' },
+      { titulo: 'Miembros registrados', valor: `${miembros}+`, texto: 'Estudiantes participando en la comunidad CEUTEC.' }
+    ];
+  });
+
+  readonly clubesFiltrados = computed(() => {
+    const termino = this.filtro().toLowerCase().trim();
+    if (!termino) return this.clubesActivos();
+
+    return this.clubesActivos().filter(club =>
+      club.nombre.toLowerCase().includes(termino) ||
+      club.categoria.toLowerCase().includes(termino) ||
+      (club.descripcion ?? '').toLowerCase().includes(termino)
+    );
+  });
+
+  readonly clubesDestacados = computed(() =>
+    [...this.clubesActivos()]
+      .sort((a, b) => (Number(b.miembros) || 0) - (Number(a.miembros) || 0))
+      .slice(0, 3)
+  );
+
+  readonly carouselSlides = signal([
+    {
+      titulo: 'Placeholder 1',
+      texto: 'Reemplaza imageUrl con la ruta real, por ejemplo: images/nombre-imagen.jpg',
+      imageUrl: ''
+    },
+    {
+      titulo: 'Placeholder 2',
+      texto: 'Las imágenes deben colocarse en src/images y referenciarse como images/archivo.ext',
+      imageUrl: ''
+    },
+    {
+      titulo: 'Placeholder 3',
+      texto: 'Puedes agregar más objetos a este arreglo para escalar el carrusel',
+      imageUrl: ''
+    }
   ]);
 
-  readonly pasos = signal([
-    { num: '1', titulo: 'Crea tu cuenta',       desc: 'Regístrate con tu correo institucional.' },
-    { num: '2', titulo: 'Explora los clubes',   desc: 'Navega el directorio y conoce cada organización.' },
-    { num: '3', titulo: 'Solicita tu ingreso',  desc: 'Envía una solicitud y espera la aprobación.' }
+  readonly beneficios = signal([
+    {
+      icono: '🎓',
+      titulo: 'Desarrollo profesional',
+      desc: 'Fortalece habilidades académicas y profesionales mientras colaboras con otros estudiantes.'
+    },
+    {
+      icono: '🤝',
+      titulo: 'Networking',
+      desc: 'Crea contactos con compañeros, docentes y líderes de distintas áreas de CEUTEC.'
+    },
+    {
+      icono: '🏆',
+      titulo: 'Participación en eventos',
+      desc: 'Forma parte de actividades, competencias, talleres y experiencias universitarias.'
+    },
+    {
+      icono: '📜',
+      titulo: 'Certificados y experiencia',
+      desc: 'Suma participación relevante para tu desarrollo curricular y vida profesional.'
+    },
+    {
+      icono: '💡',
+      titulo: 'Proyectos reales',
+      desc: 'Aprende de forma práctica resolviendo retos y construyendo iniciativas con impacto.'
+    }
   ]);
+
+  imagenClub(club: Club): string {
+    return club.imagenUrl || club.logoUrl || '';
+  }
 }

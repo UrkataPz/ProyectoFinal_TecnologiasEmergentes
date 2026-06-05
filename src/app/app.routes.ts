@@ -27,14 +27,12 @@ export const routes: Routes = [
   {
     path: 'clubes',
     title: 'Clubes | Clubes CEUTEC',
-    component: ClubesComponent,
-    canActivate: [authGuard]
+    component: ClubesComponent
   },
   {
     path: 'clubes/:id',
     title: 'Detalle de Club | Clubes CEUTEC',
-    component: DetalleClubComponent,
-    canActivate: [authGuard]
+    component: DetalleClubComponent
   },
   {
     path: 'clubes/:id/feed',

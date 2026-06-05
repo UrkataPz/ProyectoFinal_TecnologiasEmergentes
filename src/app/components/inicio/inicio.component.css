@@ -1,7 +1,214 @@
-.stats { margin-top: 16px; }
-.mt    { margin-top: 20px; }
+.inicio-page {
+  display: grid;
+  gap: 18px;
+}
 
-.card h3 { margin-bottom: 8px; }
+.inicio-page > * {
+  width: 100%;
+  min-width: 0;
+}
+
+.hero-content {
+  min-width: 0;
+}
+
+.hero h1 {
+  max-width: 780px;
+}
+
+.hero p {
+  max-width: 760px;
+}
+
+.carousel-section,
+.search-section,
+.stats,
+.mt {
+  margin-top: 2px;
+}
+
+.section-title.compact {
+  margin-bottom: 10px;
+}
+
+.carousel {
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.carousel-track {
+  display: flex;
+  width: 300%;
+  animation: carousel-slide 15s infinite;
+}
+
+.carousel-slide {
+  position: relative;
+  flex: 0 0 33.333%;
+  min-height: 210px;
+  overflow: hidden;
+}
+
+.carousel-slide img,
+.carousel-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 210px;
+  object-fit: cover;
+}
+
+.carousel-placeholder {
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(135deg, rgba(0, 48, 135, 0.92), rgba(0, 32, 96, 0.9)),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 16px);
+  color: var(--white);
+}
+
+.carousel-placeholder span {
+  border: 1px dashed rgba(255,255,255,0.65);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  font-weight: 800;
+}
+
+.carousel-caption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 14px;
+  background: linear-gradient(180deg, transparent, rgba(0, 32, 96, 0.94));
+  color: var(--white);
+}
+
+.carousel-caption h3 {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.carousel-caption p {
+  max-width: 680px;
+  color: rgba(255,255,255,0.86);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+@keyframes carousel-slide {
+  0%, 28% { transform: translateX(0); }
+  34%, 62% { transform: translateX(-33.333%); }
+  68%, 94% { transform: translateX(-66.666%); }
+  100% { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-track {
+    animation: none;
+  }
+}
+
+.search-section {
+  display: grid;
+  gap: 14px;
+}
+
+.search-section h2,
+.stats h2 {
+  color: var(--primary-dark);
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+
+.search-section p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.search-field {
+  display: grid;
+  gap: 7px;
+}
+
+.search-count,
+.members {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.featured-grid,
+.benefits-grid {
+  align-items: stretch;
+}
+
+.featured-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.featured-card p {
+  flex: 1;
+}
+
+.club-media {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--secondary);
+  color: var(--primary-dark);
+  font-size: 2.4rem;
+  font-weight: 900;
+}
+
+.club-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.benefits-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+}
+
+.benefit-card {
+  display: grid;
+  gap: 8px;
+}
+
+.benefit-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--secondary);
+  font-size: 1.35rem;
+}
+
+.cta-section {
+  margin-bottom: 4px;
+}
+
+.cta-card {
+  border-left: 4px solid var(--accent);
+}
 
 .cta-card .actions {
   display: flex;
@@ -10,10 +217,47 @@
 }
 
 @media (min-width: 480px) {
-  .cta-card .actions { flex-direction: row; flex-wrap: wrap; }
+  .inicio-page {
+    gap: 20px;
+  }
+
+  .carousel-slide,
+  .carousel-slide img,
+  .carousel-placeholder {
+    min-height: 250px;
+  }
+
+  .cta-card .actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 }
 
 @media (min-width: 768px) {
-  .stats { margin-top: 22px; }
-  .mt    { margin-top: 28px; }
+  .inicio-page {
+    gap: 24px;
+  }
+
+  .carousel-slide,
+  .carousel-slide img,
+  .carousel-placeholder {
+    min-height: 320px;
+  }
+
+  .search-section {
+    grid-template-columns: 0.8fr 1.2fr;
+    align-items: end;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .benefits-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
 }
