@@ -7,5 +7,7 @@ export interface Club {
   requisitos: string;
   miembros: number;
   activo: boolean;
+  imagenUrl?: string;
+  logoUrl?: string;
   creadoEn?: any;
 }
