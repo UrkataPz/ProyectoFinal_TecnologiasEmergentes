@@ -13,17 +13,30 @@
 
   @if (mostrarAcciones()) {
     <div class="actions">
-      <button class="btn btn-blue" (click)="verDetalle.emit(club().id!)">
+      <button class="btn btn-blue" (click)="verDetalle.emit(club().id!)"
+              [attr.aria-label]="'Ver detalle de ' + club().nombre">
         Ver detalle
       </button>
       @if (estadoSolicitud() === 'aprobada') {
-        <a class="btn btn-blue" [routerLink]="['/clubes', club().id!, 'feed']">Ir al club</a>
+        <a class="btn btn-blue" [routerLink]="['/clubes', club().id!, 'feed']"
+           [attr.aria-label]="'Ir al club ' + club().nombre">
+          Ir al club
+        </a>
       } @else if (estadoSolicitud() === 'pendiente') {
-        <span class="btn btn-light solicitud-estado">Solicitud pendiente</span>
+        <span class="btn btn-light solicitud-estado"
+              role="status"
+              [attr.aria-label]="'Solicitud pendiente para ' + club().nombre">
+          Solicitud pendiente
+        </span>
       } @else if (estadoSolicitud() === 'rechazada') {
-        <span class="btn btn-light solicitud-estado">Solicitud rechazada</span>
+        <span class="btn btn-light solicitud-estado"
+              role="status"
+              [attr.aria-label]="'Solicitud rechazada para ' + club().nombre">
+          Solicitud rechazada
+        </span>
       } @else {
-        <button class="btn btn-light" (click)="solicitarIngreso.emit(club())">
+        <button class="btn btn-light" (click)="solicitarIngreso.emit(club())"
+                [attr.aria-label]="'Solicitar ingreso a ' + club().nombre">
           Solicitar ingreso
         </button>
       }

@@ -2,11 +2,11 @@
   Universidad Tecnológica Centroamericana — CEUTEC | Sistema de Clubes Estudiantiles
 </div>
 
-<header class="navbar">
+<header class="navbar" aria-label="Barra de navegación principal">
   <div class="navbar-inner">
     <div class="navbar-top">
-      <a class="brand" routerLink="/" (click)="cerrarMenu()" aria-label="Ir al inicio">
-        <span class="brand-icon">CE</span>
+      <a class="brand" routerLink="/" (click)="cerrarMenu()" aria-label="CEUTEC Clubes — Ir al inicio">
+        <span class="brand-icon" aria-hidden="true">CE</span>
         <span class="brand-text">
           <strong>CEUTEC Clubes</strong>
           <small>Organizaciones estudiantiles</small>
@@ -14,17 +14,23 @@
       </a>
 
       <div class="nav-actions-mobile">
-          @if (isLoggedIn()) {
+        @if (isLoggedIn()) {
           <div class="notif-wrap">
-            <button class="notif-btn" (click)="toggleNotif()" aria-label="Notificaciones">
-              🔔
+            <button class="notif-btn"
+                    (click)="toggleNotif()"
+                    [attr.aria-label]="'Notificaciones' + (noLeidas() > 0 ? ', ' + noLeidas() + ' sin leer' : '')"
+                    aria-haspopup="true"
+                    [attr.aria-expanded]="notifAbiertas()"
+                    aria-controls="notif-dropdown-mobile">
+              <span aria-hidden="true">🔔</span>
               @if (noLeidas() > 0) {
-                <span class="notif-badge">{{ noLeidas() > 9 ? '9+' : noLeidas() }}</span>
+                <span class="notif-badge" aria-hidden="true">{{ noLeidas() > 9 ? '9+' : noLeidas() }}</span>
               }
             </button>
 
             @if (notifAbiertas()) {
-              <div class="notif-dropdown">
+              <div id="notif-dropdown-mobile" class="notif-dropdown" role="dialog"
+                   [attr.aria-label]="'Notificaciones' + (noLeidas() > 0 ? ', ' + noLeidas() + ' sin leer' : '')">
                 <div class="notif-header">
                   <span>Notificaciones</span>
                   @if (noLeidas() > 0) {
@@ -34,17 +40,21 @@
                 @if (notificaciones().length === 0) {
                   <p class="notif-empty">Sin notificaciones</p>
                 } @else {
-                  <ul class="notif-list">
+                  <ul class="notif-list" role="list">
                     @for (n of notificaciones(); track n.id) {
                       <li class="notif-item" [ngClass]="{ 'notif-unread': !n.leida }"
-                          (click)="marcarLeida(n.id!)">
-                        <span class="notif-icon">{{ iconoPorTipo(n.tipo) }}</span>
+                          (click)="marcarLeida(n.id!)"
+                          (keydown.enter)="marcarLeida(n.id!)"
+                          (keydown.space)="$event.preventDefault(); marcarLeida(n.id!)"
+                          tabindex="0"
+                          [attr.aria-label]="n.titulo + ': ' + n.mensaje + (n.leida ? '' : ' (no leída)')">
+                        <span class="notif-icon" aria-hidden="true">{{ iconoPorTipo(n.tipo) }}</span>
                         <div class="notif-body">
                           <strong>{{ n.titulo }}</strong>
                           <p>{{ n.mensaje }}</p>
                         </div>
                         <button class="notif-del" (click)="eliminarNotif(n.id!, $event)"
-                                aria-label="Eliminar">✕</button>
+                                [attr.aria-label]="'Eliminar notificación: ' + n.titulo">✕</button>
                       </li>
                     }
                   </ul>
@@ -54,41 +64,59 @@
           </div>
         }
 
-        <button class="hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuAbierto()" aria-label="Menú">
+        <button class="hamburger"
+                (click)="toggleMenu()"
+                [attr.aria-expanded]="menuAbierto()"
+                aria-controls="main-nav"
+                aria-label="Menú de navegación">
           @if (menuAbierto()) {
-            <span class="ham-icon">✕</span>
+            <span class="ham-icon" aria-hidden="true">✕</span>
           } @else {
-            <span class="ham-icon">☰</span>
+            <span class="ham-icon" aria-hidden="true">☰</span>
           }
         </button>
       </div>
     </div>
 
-    <nav class="nav-links" [class.open]="menuAbierto()" aria-label="Navegación principal">
+    <nav id="main-nav" class="nav-links" [class.open]="menuAbierto()" aria-label="Principal">
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+         #rlaHome="routerLinkActive"
+         [attr.aria-current]="rlaHome.isActive ? 'page' : null"
          (click)="cerrarMenu()">Inicio</a>
-      <a routerLink="/clubes" routerLinkActive="active" (click)="cerrarMenu()">Clubes</a>
+      <a routerLink="/clubes" routerLinkActive="active"
+         #rlaClubes="routerLinkActive"
+         [attr.aria-current]="rlaClubes.isActive ? 'page' : null"
+         (click)="cerrarMenu()">Clubes</a>
 
       @if (isLoggedIn()) {
-        <a routerLink="/panel-usuario" routerLinkActive="active" (click)="cerrarMenu()" class="nav-user-link">
-          @if (photoURL()) {
-            <img class="nav-avatar" [src]="photoURL()!" [alt]="displayName()">
+        <a routerLink="/panel-usuario" routerLinkActive="active"
+           #rlaPanel="routerLinkActive"
+           [attr.aria-current]="rlaPanel.isActive ? 'page' : null"
+           (click)="cerrarMenu()" class="nav-user-link">
+          @if (fotoUrl()) {
+            <img class="nav-avatar" [src]="fotoUrl()!" [alt]="displayName() || 'Avatar'">
           } @else {
-            <span class="nav-initial">{{ (displayName() || 'U')[0].toUpperCase() }}</span>
+            <span class="nav-initial" aria-hidden="true">{{ (displayName() || 'U')[0].toUpperCase() }}</span>
           }
           {{ displayName() || 'Panel' }}
         </a>
 
         <div class="notif-wrap notif-desktop">
-          <button class="notif-btn" (click)="toggleNotif()" aria-label="Notificaciones">
-            🔔
+          <button class="notif-btn"
+                  (click)="toggleNotif()"
+                  [attr.aria-label]="'Notificaciones' + (noLeidas() > 0 ? ', ' + noLeidas() + ' sin leer' : '')"
+                  aria-haspopup="true"
+                  [attr.aria-expanded]="notifAbiertas()"
+                  aria-controls="notif-dropdown-desktop">
+            <span aria-hidden="true">🔔</span>
             @if (noLeidas() > 0) {
-              <span class="notif-badge">{{ noLeidas() > 9 ? '9+' : noLeidas() }}</span>
+              <span class="notif-badge" aria-hidden="true">{{ noLeidas() > 9 ? '9+' : noLeidas() }}</span>
             }
           </button>
 
           @if (notifAbiertas()) {
-            <div class="notif-dropdown notif-dropdown-right">
+            <div id="notif-dropdown-desktop" class="notif-dropdown notif-dropdown-right" role="dialog"
+                 [attr.aria-label]="'Notificaciones' + (noLeidas() > 0 ? ', ' + noLeidas() + ' sin leer' : '')">
               <div class="notif-header">
                 <span>Notificaciones</span>
                 @if (noLeidas() > 0) {
@@ -98,17 +126,21 @@
               @if (notificaciones().length === 0) {
                 <p class="notif-empty">Sin notificaciones</p>
               } @else {
-                <ul class="notif-list">
+                <ul class="notif-list" role="list">
                   @for (n of notificaciones(); track n.id) {
                     <li class="notif-item" [ngClass]="{ 'notif-unread': !n.leida }"
-                        (click)="marcarLeida(n.id!)">
-                      <span class="notif-icon">{{ iconoPorTipo(n.tipo) }}</span>
+                        (click)="marcarLeida(n.id!)"
+                        (keydown.enter)="marcarLeida(n.id!)"
+                        (keydown.space)="$event.preventDefault(); marcarLeida(n.id!)"
+                        tabindex="0"
+                        [attr.aria-label]="n.titulo + ': ' + n.mensaje + (n.leida ? '' : ' (no leída)')">
+                      <span class="notif-icon" aria-hidden="true">{{ iconoPorTipo(n.tipo) }}</span>
                       <div class="notif-body">
                         <strong>{{ n.titulo }}</strong>
                         <p>{{ n.mensaje }}</p>
                       </div>
                       <button class="notif-del" (click)="eliminarNotif(n.id!, $event)"
-                              aria-label="Eliminar">✕</button>
+                              [attr.aria-label]="'Eliminar notificación: ' + n.titulo">✕</button>
                     </li>
                   }
                 </ul>
@@ -117,8 +149,14 @@
           }
         </div>
       } @else {
-        <a routerLink="/login" routerLinkActive="active" (click)="cerrarMenu()">Login</a>
-        <a class="register" routerLink="/registro" routerLinkActive="active" (click)="cerrarMenu()">
+        <a routerLink="/login" routerLinkActive="active"
+           #rlaLogin="routerLinkActive"
+           [attr.aria-current]="rlaLogin.isActive ? 'page' : null"
+           (click)="cerrarMenu()">Login</a>
+        <a class="register" routerLink="/registro" routerLinkActive="active"
+           #rlaRegistro="routerLinkActive"
+           [attr.aria-current]="rlaRegistro.isActive ? 'page' : null"
+           (click)="cerrarMenu()">
           Registro
         </a>
       }

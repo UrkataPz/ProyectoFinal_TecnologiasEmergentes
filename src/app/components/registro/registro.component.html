@@ -5,7 +5,7 @@
     <p>Únete a la plataforma de clubes estudiantiles de CEUTEC.</p>
   </div>
 
-  <form class="card form-card" (ngSubmit)="registrar()">
+  <form class="card form-card" (ngSubmit)="registrar()" novalidate>
     <div class="form-group">
       <label for="nombre">Nombre completo</label>
       <input
@@ -15,7 +15,8 @@
         placeholder="Tu nombre completo"
         [value]="nombre()"
         (input)="nombre.set($any($event.target).value)"
-        required>
+        required
+        aria-required="true">
     </div>
 
     <div class="form-group">
@@ -27,7 +28,8 @@
         placeholder="correo@unitec.edu"
         [value]="correo()"
         (input)="correo.set($any($event.target).value)"
-        required>
+        required
+        aria-required="true">
     </div>
 
     <div class="form-group">
@@ -35,7 +37,8 @@
       <select id="carrera" name="carrera"
               [value]="carrera()"
               (change)="carrera.set($any($event.target).value)"
-              required>
+              required
+              aria-required="true">
         <option value="">Selecciona tu carrera</option>
         <option value="Ingeniería de Software">Ingeniería de Software</option>
         <option value="Administración">Administración</option>
@@ -66,7 +69,8 @@
         placeholder="Mínimo 6 caracteres"
         [value]="password()"
         (input)="password.set($any($event.target).value)"
-        required>
+        required
+        aria-required="true">
     </div>
 
     <div class="form-group">
@@ -78,16 +82,21 @@
         placeholder="Repite tu contraseña"
         [value]="confirmPassword()"
         (input)="confirmPassword.set($any($event.target).value)"
-        required>
+        required
+        aria-required="true"
+        aria-describedby="confirm-pwd-error"
+        [attr.aria-invalid]="confirmPassword() && !passwordsCoinciden() ? 'true' : null">
 
       @if (confirmPassword() && !passwordsCoinciden()) {
-        <small class="field-error">Las contraseñas no coinciden</small>
+        <small id="confirm-pwd-error" class="field-error" role="alert">Las contraseñas no coinciden</small>
       }
     </div>
 
-    <button class="btn btn-blue" type="submit" [disabled]="isLoading()">
+    <button class="btn btn-blue" type="submit"
+            [disabled]="isLoading()"
+            [attr.aria-busy]="isLoading() ? 'true' : null">
       @if (isLoading()) {
-        <span class="spinner"></span>
+        <span class="spinner" aria-hidden="true"></span>
         Creando cuenta...
       } @else {
         Crear cuenta
@@ -98,12 +107,14 @@
       ¿Ya tienes una cuenta? <a routerLink="/login">Inicia sesión</a>
     </p>
 
-    @if (mensaje()) {
-      <p class="notice"
-         [class.notice-success]="mensaje().startsWith('✅')"
-         [class.notice-error]="mensaje().startsWith('❌')">
-        {{ mensaje() }}
-      </p>
-    }
+    <div role="status" aria-live="polite" aria-atomic="true">
+      @if (mensaje()) {
+        <p class="notice"
+           [class.notice-success]="mensaje().startsWith('✅')"
+           [class.notice-error]="mensaje().startsWith('❌')">
+          {{ mensaje() }}
+        </p>
+      }
+    </div>
   </form>
 </section>

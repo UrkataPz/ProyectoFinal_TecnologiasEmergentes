@@ -12,30 +12,33 @@
       type="search"
       placeholder="Buscar por nombre o categoría..."
       [value]="filtro()"
-      (input)="filtro.set($any($event.target).value)">
-    <span class="search-count">
+      (input)="filtro.set($any($event.target).value)"
+      aria-controls="clubes-lista">
+    <span class="search-count" aria-live="polite" aria-atomic="true">
       {{ clubesFiltrados().length }} resultado{{ clubesFiltrados().length !== 1 ? 's' : '' }}
     </span>
   </div>
 
-  @if (mensajeAccion()) {
-    <p class="notice"
-       [class.notice-success]="mensajeAccion().startsWith('✅')"
-       [class.notice-error]="mensajeAccion().startsWith('❌')">
-      {{ mensajeAccion() }}
-    </p>
-  }
+  <div role="status" aria-live="polite" aria-atomic="true">
+    @if (mensajeAccion()) {
+      <p class="notice"
+         [class.notice-success]="mensajeAccion().startsWith('✅')"
+         [class.notice-error]="mensajeAccion().startsWith('❌')">
+        {{ mensajeAccion() }}
+      </p>
+    }
+  </div>
 
   @if (clubes().length === 0) {
-    <div class="card empty-state">
+    <div class="card empty-state" role="status">
       <p>Cargando clubes...</p>
     </div>
   } @else if (clubesFiltrados().length === 0) {
-    <div class="card empty-state">
+    <div class="card empty-state" role="status">
       <p>No se encontraron clubes con ese criterio.</p>
     </div>
   } @else {
-    <div class="grid grid-2 club-list">
+    <div id="clubes-lista" class="grid grid-2 club-list">
       @for (club of clubesFiltrados(); track club.id) {
         <app-club-card
           [club]="club"

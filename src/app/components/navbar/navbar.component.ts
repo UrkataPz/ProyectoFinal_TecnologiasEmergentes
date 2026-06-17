@@ -2,9 +2,10 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { switchMap, of } from 'rxjs';
+import { switchMap, of, map } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { NotificacionesService } from '../../services/notificaciones.service';
+import { UserService } from '../panel-usuario/user.service';
 
 @Component({
   selector: 'app-navbar',
@@ -16,10 +17,18 @@ import { NotificacionesService } from '../../services/notificaciones.service';
 export class NavbarComponent {
   readonly authService = inject(AuthService);
   private notifService = inject(NotificacionesService);
+  private userService  = inject(UserService);
 
   readonly isLoggedIn  = this.authService.isLoggedIn;
   readonly displayName = this.authService.displayName;
-  readonly photoURL    = this.authService.photoURL;
+
+  readonly fotoUrl = toSignal(
+    toObservable(this.authService.uid).pipe(
+      switchMap(uid => uid ? this.userService.getProfile(uid) : of(undefined)),
+      map(p => p?.fotoUrl ?? null)
+    ),
+    { initialValue: null }
+  );
 
   menuAbierto   = signal(false);
   notifAbiertas = signal(false);

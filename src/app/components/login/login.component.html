@@ -5,7 +5,7 @@
     <p>Ingresa con tu correo institucional para acceder a los clubes universitarios.</p>
   </div>
 
-  <form class="card form-card" (ngSubmit)="iniciarSesion()">
+  <form class="card form-card" (ngSubmit)="iniciarSesion()" novalidate>
     <div class="form-group">
       <label for="correo">Correo institucional</label>
       <input
@@ -16,7 +16,8 @@
         [value]="correo()"
         (input)="correo.set($any($event.target).value)"
         [disabled]="isLoading()"
-        required>
+        required
+        aria-required="true">
     </div>
 
     <div class="form-group">
@@ -29,12 +30,15 @@
         [value]="password()"
         (input)="password.set($any($event.target).value)"
         [disabled]="isLoading()"
-        required>
+        required
+        aria-required="true">
     </div>
 
-    <button class="btn btn-blue" type="submit" [disabled]="isLoading()">
+    <button class="btn btn-blue" type="submit"
+            [disabled]="isLoading()"
+            [attr.aria-busy]="isLoading() ? 'true' : null">
       @if (isLoading()) {
-        <span class="spinner"></span>
+        <span class="spinner" aria-hidden="true"></span>
         Verificando...
       } @else {
         Ingresar
@@ -45,12 +49,14 @@
       Crear cuenta nueva
     </a>
 
-    @if (mensaje()) {
-      <p class="notice"
-         [class.notice-success]="mensaje().startsWith('✅')"
-         [class.notice-error]="mensaje().startsWith('❌')">
-        {{ mensaje() }}
-      </p>
-    }
+    <div role="status" aria-live="polite" aria-atomic="true">
+      @if (mensaje()) {
+        <p class="notice"
+           [class.notice-success]="mensaje().startsWith('✅')"
+           [class.notice-error]="mensaje().startsWith('❌')">
+          {{ mensaje() }}
+        </p>
+      }
+    </div>
   </form>
 </section>

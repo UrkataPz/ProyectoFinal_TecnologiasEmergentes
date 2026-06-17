@@ -1,19 +1,19 @@
 <section class="page">
   @if (club() === undefined) {
-    <div class="card">
+    <div class="card" role="status" aria-live="polite">
       <p>Cargando información del club...</p>
     </div>
 
   } @else if (!club()) {
-    <div class="card">
+    <div class="card" role="alert">
       <h1>Club no encontrado</h1>
       <p>No se encontró información para este club.</p>
       <a class="btn btn-blue" routerLink="/clubes">Volver al directorio</a>
     </div>
 
   } @else if (!accesoPermitido()) {
-    <div class="card access-gate">
-      <div class="gate-icon">🔒</div>
+    <div class="card access-gate" role="alert">
+      <div class="gate-icon" aria-hidden="true">🔒</div>
       <h2>{{ club()!.nombre }}</h2>
 
       @if (miSolicitud()?.estado === 'pendiente') {
@@ -62,42 +62,47 @@
         @if (eventos().length === 0) {
           <p class="muted-msg">Este club no tiene eventos programados.</p>
         } @else {
-          <div class="eventos-list">
+          <ul class="eventos-list" aria-label="Lista de próximos eventos">
             @for (ev of eventos(); track ev.id) {
               @if (ev.activo) {
-                <div class="evento-card">
+                <li class="evento-card">
                   <div class="evento-header">
                     <strong>{{ ev.titulo }}</strong>
                     <span class="evento-fecha">
-                      📅 {{ formatearFecha(ev.fecha, ev.hora) }}
+                      <span aria-hidden="true">📅</span> {{ formatearFecha(ev.fecha, ev.hora) }}
                     </span>
                   </div>
                   <p>{{ ev.descripcion }}</p>
-                  <span class="evento-lugar">📍 {{ ev.lugar }}</span>
-                </div>
+                  <span class="evento-lugar"><span aria-hidden="true">📍</span> {{ ev.lugar }}</span>
+                </li>
               }
             }
-          </div>
+          </ul>
         }
       </div>
 
-      @if (mensajeAccion()) {
-        <p class="notice"
-           [class.notice-success]="mensajeAccion().startsWith('✅')"
-           [class.notice-error]="mensajeAccion().startsWith('❌')">
-          {{ mensajeAccion() }}
-        </p>
-      }
+      <div role="status" aria-live="polite" aria-atomic="true">
+        @if (mensajeAccion()) {
+          <p class="notice"
+             [class.notice-success]="mensajeAccion().startsWith('✅')"
+             [class.notice-error]="mensajeAccion().startsWith('❌')">
+            {{ mensajeAccion() }}
+          </p>
+        }
+      </div>
 
       <div class="actions">
         @if (club()!.activo) {
           @if (isLoggedIn()) {
             @if (miSolicitud()?.estado === 'aprobada') {
-              <a class="btn btn-blue" [routerLink]="['/clubes', id(), 'feed']">Ir al club</a>
+              <a class="btn btn-blue" [routerLink]="['/clubes', id(), 'feed']"
+                 [attr.aria-label]="'Ir al club ' + club()!.nombre">Ir al club</a>
             } @else if (!miSolicitud()) {
-              <button class="btn btn-blue" (click)="solicitar()" [disabled]="enviando()">
+              <button class="btn btn-blue" (click)="solicitar()" [disabled]="enviando()"
+                      [attr.aria-busy]="enviando() ? 'true' : null"
+                      [attr.aria-label]="'Solicitar ingreso a ' + club()!.nombre">
                 @if (enviando()) {
-                  <span class="spinner"></span> Enviando...
+                  <span class="spinner" aria-hidden="true"></span> Enviando...
                 } @else {
                   Solicitar ingreso
                 }
