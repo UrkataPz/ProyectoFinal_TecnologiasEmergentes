@@ -3,6 +3,41 @@
   flex-direction: column;
   gap: 10px;
   transition: transform 0.18s, box-shadow 0.18s;
+  overflow: hidden;
+  padding: 0;
+}
+
+.card-cover {
+  width: 100%;
+  height: 130px;
+  flex-shrink: 0;
+}
+
+.card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, #1a52a8 100%);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+.club-card-body {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
 }
 
 .topline {
@@ -11,6 +46,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
+  padding: 12px 16px 0;
 }
 
 .members {
@@ -22,6 +58,16 @@
 .club-card h2 {
   margin: 0;
   font-size: 1rem;
+  padding: 0 16px;
+}
+
+.club-card p {
+  padding: 0 16px;
+  margin: 0;
+}
+
+.club-card .badge-inactive {
+  margin: 0 16px;
 }
 
 .badge-inactive {
@@ -34,7 +80,7 @@
   flex-direction: column;
   gap: 8px;
   margin-top: auto;
-  padding-top: 8px;
+  padding: 8px 16px 16px;
 }
 
 .solicitud-estado {
@@ -46,6 +92,7 @@
 @media (min-width: 480px) {
   .actions { flex-direction: row; flex-wrap: wrap; }
   .club-card h2 { font-size: 1.05rem; }
+  .card-cover { height: 140px; }
 }
 
 @media (min-width: 768px) {
@@ -53,4 +100,12 @@
     transform: translateY(-3px);
     box-shadow: 0 24px 52px rgba(16, 24, 40, 0.13);
   }
+
+  .card-cover { height: 150px; }
+
+  .topline { padding: 16px 24px 0; }
+  .club-card h2 { padding: 0 24px; }
+  .club-card p  { padding: 0 24px; }
+  .club-card .badge-inactive { margin: 0 24px; }
+  .actions { padding: 8px 24px 24px; }
 }

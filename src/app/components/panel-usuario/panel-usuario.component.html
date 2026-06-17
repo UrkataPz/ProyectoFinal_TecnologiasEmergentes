@@ -263,6 +263,37 @@
                    (input)="actualizarCampo('requisitos', $any($event.target).value)">
           </div>
 
+          <div class="form-group">
+            <label>Imagen de portada</label>
+            @if (formClub().imagenUrl) {
+              <img class="portada-thumb" [src]="formClub().imagenUrl!" alt="Vista previa de portada del club">
+            } @else {
+              <div class="portada-placeholder" aria-hidden="true">Sin imagen</div>
+            }
+            <div class="portada-actions">
+              <label class="portada-upload-btn"
+                     [class.uploading]="subiendoPortada()"
+                     [attr.aria-busy]="subiendoPortada() ? 'true' : null">
+                @if (subiendoPortada()) { Procesando... } @else { <span aria-hidden="true">🖼️</span> Subir portada }
+                <input type="file" accept="image/*" style="display:none"
+                  (change)="onPortadaSeleccionada($event)" [disabled]="subiendoPortada()"
+                  aria-label="Seleccionar imagen de portada del club">
+              </label>
+              @if (formClub().imagenUrl) {
+                <button type="button" class="btn btn-light btn-sm"
+                        (click)="quitarPortada()"
+                        aria-label="Quitar imagen de portada">
+                  Quitar imagen
+                </button>
+              }
+            </div>
+            <div role="status" aria-live="polite" aria-atomic="true">
+              @if (portadaMensaje()) {
+                <small>{{ portadaMensaje() }}</small>
+              }
+            </div>
+          </div>
+
           <div class="form-group check-group">
             <label>
               <input type="checkbox"
