@@ -261,11 +261,11 @@
         <div class="vista-header">
           <h2>Miembros del club</h2>
           <span class="muted-msg" aria-live="polite">
-            {{ miembrosClub().length }} miembro{{ miembrosClub().length !== 1 ? 's' : '' }}
+            {{ miembrosConPerfil().length }} miembro{{ miembrosConPerfil().length !== 1 ? 's' : '' }}
           </span>
         </div>
 
-        @if (miembrosClub().length === 0) {
+        @if (miembrosConPerfil().length === 0) {
           <div class="card empty-state" role="status">
             <p class="muted-msg">Ningún miembro aprobado en este club todavía.</p>
             @if (esModerador()) {
@@ -279,11 +279,11 @@
           </div>
         } @else {
           <div class="miembros-list">
-            @for (m of miembrosClub(); track m.id) {
+            @for (m of miembrosConPerfil(); track m.id) {
               <div class="card miembro-card">
                 <div class="miembro-fila">
-                  @if (fotosMiembros()[m.usuarioId]) {
-                    <img class="avatar avatar-foto" [src]="fotosMiembros()[m.usuarioId]" [alt]="m.usuarioNombre" aria-hidden="true">
+                  @if (m.fotoUrl) {
+                    <img class="avatar avatar-foto" [src]="m.fotoUrl" [alt]="m.usuarioNombre" aria-hidden="true">
                   } @else {
                     <div class="avatar" [style.background]="colorAvatar(m.usuarioNombre)"
                          aria-hidden="true">
@@ -480,8 +480,8 @@
         @for (item of mesaDirectiva(); track item.rol) {
           <div class="directiva-item">
             @if (item.miembro) {
-              @if (fotosMiembros()[item.miembro.usuarioId]) {
-                <img class="avatar avatar-sm avatar-foto" [src]="fotosMiembros()[item.miembro.usuarioId]" [alt]="item.miembro.usuarioNombre" aria-hidden="true">
+              @if (item.miembro.fotoUrl) {
+                <img class="avatar avatar-sm avatar-foto" [src]="item.miembro.fotoUrl" [alt]="item.miembro.usuarioNombre" aria-hidden="true">
               } @else {
                 <div class="avatar avatar-sm" [style.background]="colorAvatar(item.miembro.usuarioNombre)"
                      aria-hidden="true">

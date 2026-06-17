@@ -16,6 +16,11 @@ import { RolClub } from '../../models/solicitud.model';
 type Vista     = 'inicio' | 'miembros' | 'eventos';
 type Categoria = 'Todos' | 'Anuncios' | 'Eventos' | 'Proyectos' | 'Social';
 
+interface PerfilLigero {
+  nombre: string;
+  foto: string;
+}
+
 interface CalendarDay {
   date: Date;
   iso: string;
@@ -96,28 +101,52 @@ export class ClubFeedComponent {
     { initialValue: [] }
   );
 
-  readonly fotosMiembros = toSignal(
+  readonly perfilesMiembros = toSignal(
     toObservable(this.miembrosClub).pipe(
-      switchMap(miembros => {
-        if (!miembros.length) return of({} as Record<string, string>);
-        return combineLatest(
-          miembros.map(m =>
-            this.userService.getProfile(m.usuarioId).pipe(
-              map(p => ({ uid: m.usuarioId, foto: p?.fotoUrl ?? '' })),
-              catchError(() => of({ uid: m.usuarioId, foto: '' }))
-            )
-          )
-        ).pipe(
-          map(items => {
-            const result: Record<string, string> = {};
-            for (const { uid, foto } of items) { if (foto) result[uid] = foto; }
-            return result;
-          })
-        );
-      })
+      switchMap(miembros => this.cargarPerfiles(miembros.map(m => m.usuarioId)))
     ),
-    { initialValue: {} as Record<string, string> }
+    { initialValue: {} as Record<string, PerfilLigero> }
   );
+
+  readonly perfilesAutores = toSignal(
+    combineLatest([toObservable(this.posts), toObservable(this.comentarios)]).pipe(
+      map(([posts, comentarios]) => {
+        const ids = new Set<string>();
+        for (const p of posts) ids.add(p.autorId);
+        for (const c of comentarios) ids.add(c.autorId);
+        return Array.from(ids);
+      }),
+      switchMap(ids => this.cargarPerfiles(ids))
+    ),
+    { initialValue: {} as Record<string, PerfilLigero> }
+  );
+
+  readonly miembrosConPerfil = computed(() => {
+    const perfiles = this.perfilesMiembros();
+    return this.miembrosClub().map(m => ({
+      ...m,
+      usuarioNombre: perfiles[m.usuarioId]?.nombre || m.usuarioNombre,
+      fotoUrl: perfiles[m.usuarioId]?.foto || ''
+    }));
+  });
+
+  private cargarPerfiles(ids: string[]) {
+    if (!ids.length) return of({} as Record<string, PerfilLigero>);
+    return combineLatest(
+      ids.map(id =>
+        this.userService.getProfile(id).pipe(
+          map(p => ({ id, nombre: p?.nombre ?? '', foto: p?.fotoUrl ?? '' })),
+          catchError(() => of({ id, nombre: '', foto: '' }))
+        )
+      )
+    ).pipe(
+      map(items => {
+        const result: Record<string, PerfilLigero> = {};
+        for (const { id, nombre, foto } of items) result[id] = { nombre, foto };
+        return result;
+      })
+    );
+  }
 
   readonly uid = this.authService.uid;
 
@@ -158,15 +187,26 @@ export class ClubFeedComponent {
 
   readonly postsFiltrados = computed(() => {
     const cat = this.categoriaActiva();
-    if (cat === 'Todos') return this.posts();
-    return this.posts().filter(p => p.categoria === cat);
+    const perfiles = this.perfilesAutores();
+    const base = cat === 'Todos' ? this.posts() : this.posts().filter(p => p.categoria === cat);
+    return base.map(p => ({
+      ...p,
+      autorNombre: perfiles[p.autorId]?.nombre || p.autorNombre,
+      autorFotoUrl: perfiles[p.autorId]?.foto || p.autorFotoUrl
+    }));
   });
 
   readonly comentariosAgrupados = computed(() => {
+    const perfiles = this.perfilesAutores();
     const agrupado: Record<string, Comment[] | undefined> = {};
     for (const c of this.comentarios()) {
+      const enriquecido = {
+        ...c,
+        autorNombre: perfiles[c.autorId]?.nombre || c.autorNombre,
+        autorFotoUrl: perfiles[c.autorId]?.foto || c.autorFotoUrl
+      };
       if (!agrupado[c.postId]) agrupado[c.postId] = [];
-      agrupado[c.postId]!.push(c);
+      agrupado[c.postId]!.push(enriquecido);
     }
     return agrupado;
   });
@@ -227,7 +267,7 @@ export class ClubFeedComponent {
 
   readonly mesaDirectiva = computed(() => {
     const roles: RolClub[] = ['Presidente', 'Vicepresidente', 'Secretario', 'Tesorero'];
-    const miembros = this.miembrosClub();
+    const miembros = this.miembrosConPerfil();
     return roles.map(rol => ({
       rol,
       icono: { Presidente: '👑', Vicepresidente: '🛡️', Secretario: '✉️', Tesorero: '💰' }[rol],
@@ -285,7 +325,7 @@ export class ClubFeedComponent {
       await this.postsService.create({
         clubId:       club.id!,
         autorId:      user.uid,
-        autorNombre:  user.displayName ?? user.email ?? '',
+        autorNombre:  this.perfil()?.nombre || user.displayName || user.email || '',
         autorRolClub: this.miSolicitud()?.rolClub ?? null,
         autorFotoUrl: this.perfil()?.fotoUrl ?? null,
         categoria:    this.categoriaNuevo(),
@@ -330,7 +370,7 @@ export class ClubFeedComponent {
         postId,
         clubId:       club.id!,
         autorId:      user.uid,
-        autorNombre:  user.displayName ?? user.email ?? '',
+        autorNombre:  this.perfil()?.nombre || user.displayName || user.email || '',
         autorRolClub: this.miSolicitud()?.rolClub ?? null,
         autorFotoUrl: this.perfil()?.fotoUrl ?? null,
         contenido

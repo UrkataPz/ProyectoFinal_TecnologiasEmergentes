@@ -5,6 +5,7 @@ import { switchMap, of } from 'rxjs';
 import { ClubesService } from '../../services/clubes.service';
 import { SolicitudesService } from '../../services/solicitudes.service';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../panel-usuario/user.service';
 import { ClubCardComponent } from '../club-card/club-card.component';
 import { Club } from '../../models/club.model';
 
@@ -19,11 +20,18 @@ export class ClubesComponent {
   private clubesService = inject(ClubesService);
   private solicitudesService = inject(SolicitudesService);
   private authService = inject(AuthService);
+  private userService = inject(UserService);
   private router = inject(Router);
 
   readonly clubes = toSignal(this.clubesService.getAll(), { initialValue: [] });
   readonly filtro = signal('');
   readonly mensajeAccion = signal('');
+
+  readonly perfil = toSignal(
+    toObservable(this.authService.uid).pipe(
+      switchMap(uid => uid ? this.userService.getProfile(uid) : of(undefined))
+    )
+  );
 
   readonly misSolicitudes = toSignal(
     toObservable(this.authService.uid).pipe(
@@ -69,7 +77,7 @@ export class ClubesComponent {
     try {
       await this.solicitudesService.create({
         usuarioId: user.uid,
-        usuarioNombre: user.displayName ?? user.email ?? '',
+        usuarioNombre: this.perfil()?.nombre || user.displayName || user.email || '',
         usuarioEmail: user.email ?? '',
         clubId: club.id!,
         clubNombre: club.nombre,
