@@ -12,7 +12,9 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://sistema-clubes-estudiantiles.web.app)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://sistema-clubes-estudiantiles.firebaseapp.com)",
       "Read(//c/Users/Juss/Desktop/**)",
-      "Bash(npx firebase *)"
+      "Bash(npx firebase *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python -c ' *)"
     ]
   }
 }

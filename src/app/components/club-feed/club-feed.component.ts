@@ -270,7 +270,6 @@ export class ClubFeedComponent {
     const miembros = this.miembrosConPerfil();
     return roles.map(rol => ({
       rol,
-      icono: { Presidente: '👑', Vicepresidente: '🛡️', Secretario: '✉️', Tesorero: '💰' }[rol],
       miembro: miembros.find(m => m.rolClub === rol) ?? null
     }));
   });

@@ -73,6 +73,9 @@
 }
 
 .nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
   text-align: left;
   background: none;
   border: none;
@@ -86,6 +89,8 @@
 }
 .nav-btn:hover { background: var(--secondary); }
 .nav-btn.active { background: var(--primary); color: #fff; }
+
+.nav-icon { width: 17px; height: 17px; flex-shrink: 0; }
 
 .section-label {
   font-size: 0.75rem;
@@ -236,6 +241,7 @@
 .post-actions { display: flex; gap: 10px; }
 
 .like-btn {
+  display: inline-flex; align-items: center; gap: 6px;
   background: none; border: 1px solid var(--border);
   padding: 5px 14px; border-radius: 999px; cursor: pointer;
   font-size: 0.83rem; color: var(--muted);
@@ -244,7 +250,12 @@
 .like-btn:hover { color: var(--danger); border-color: var(--danger); }
 .like-btn.liked { color: var(--danger); border-color: var(--danger); background: #fee2e222; }
 
+.action-icon { width: 15px; height: 15px; flex-shrink: 0; }
+
 .comment-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: 1px solid var(--border);
   padding: 5px 14px;
@@ -558,7 +569,8 @@
 }
 .evento-item-header strong { font-size: 0.95rem; color: var(--primary-dark); }
 .ev-fecha { font-size: 0.78rem; color: var(--primary); font-weight: 600; }
-.ev-lugar { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.ev-lugar { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.ev-lugar-icon { width: 13px; height: 13px; flex-shrink: 0; }
 
 .directiva-item {
   display: flex;
@@ -575,7 +587,8 @@
   gap: 1px;
 }
 .directiva-info strong { font-size: 0.88rem; color: var(--primary-dark); }
-.directiva-rol { font-size: 0.75rem; color: var(--muted); }
+.directiva-rol { display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--muted); }
+.rol-icon { width: 12px; height: 12px; flex-shrink: 0; }
 
 .stat-item {
   display: flex;
