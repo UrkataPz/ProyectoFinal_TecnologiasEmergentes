@@ -15,7 +15,6 @@ export class InicioComponent {
   private clubesService = inject(ClubesService);
 
   readonly clubes = toSignal(this.clubesService.getAll(), { initialValue: [] });
-  readonly filtro = signal('');
 
   readonly clubesActivos = computed(() =>
     this.clubes().filter(club => club.activo)
@@ -35,17 +34,6 @@ export class InicioComponent {
       { titulo: 'Categorías disponibles', valor: `${categorias.size}`, texto: 'Tecnología, deportes, cultura, liderazgo y más.' },
       { titulo: 'Miembros registrados', valor: `${miembros}+`, texto: 'Estudiantes participando en la comunidad CEUTEC.' }
     ];
-  });
-
-  readonly clubesFiltrados = computed(() => {
-    const termino = this.filtro().toLowerCase().trim();
-    if (!termino) return this.clubesActivos();
-
-    return this.clubesActivos().filter(club =>
-      club.nombre.toLowerCase().includes(termino) ||
-      club.categoria.toLowerCase().includes(termino) ||
-      (club.descripcion ?? '').toLowerCase().includes(termino)
-    );
   });
 
   readonly clubesDestacados = computed(() =>

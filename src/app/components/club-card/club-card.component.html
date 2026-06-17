@@ -1,4 +1,14 @@
 <article class="card club-card">
+  @if (club().imagenUrl) {
+    <div class="card-cover">
+      <img [src]="club().imagenUrl!" [alt]="'Portada de ' + club().nombre">
+    </div>
+  } @else {
+    <div class="card-cover card-cover-placeholder" aria-hidden="true">
+      {{ club().nombre.charAt(0).toUpperCase() }}
+    </div>
+  }
+
   <div class="topline">
     <span class="badge">{{ club().categoria }}</span>
     <span class="members">{{ club().miembros }} miembros</span>
