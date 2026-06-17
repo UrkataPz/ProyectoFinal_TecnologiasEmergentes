@@ -26,20 +26,9 @@
 
     <div class="carousel" role="region" aria-label="Carrusel de imágenes destacadas">
       <div class="carousel-track">
-        @for (slide of carouselSlides(); track slide.titulo) {
-          <article class="carousel-slide" role="group" aria-roledescription="diapositiva"
-                   [attr.aria-label]="slide.titulo">
-            @if (slide.imageUrl) {
-              <img [src]="slide.imageUrl" [alt]="slide.titulo">
-            } @else {
-              <div class="carousel-placeholder" aria-hidden="true">
-                <span>{{ slide.titulo }}</span>
-              </div>
-            }
-            <div class="carousel-caption">
-              <h3>{{ slide.titulo }}</h3>
-              <p>{{ slide.texto }}</p>
-            </div>
+        @for (slide of carouselSlides(); track slide.src) {
+          <article class="carousel-slide" role="group" aria-roledescription="diapositiva">
+            <img [src]="slide.src" alt="">
           </article>
         }
       </div>

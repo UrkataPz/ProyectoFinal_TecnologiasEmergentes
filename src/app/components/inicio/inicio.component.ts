@@ -56,19 +56,13 @@ export class InicioComponent {
 
   readonly carouselSlides = signal([
     {
-      titulo: 'Placeholder 1',
-      texto: 'Reemplaza imageUrl con la ruta real, por ejemplo: images/nombre-imagen.jpg',
-      imageUrl: ''
+      src: 'images/slider1.jpg'
     },
     {
-      titulo: 'Placeholder 2',
-      texto: 'Las imágenes deben colocarse en src/images y referenciarse como images/archivo.ext',
-      imageUrl: ''
+      src: 'images/slider2.jpg'
     },
     {
-      titulo: 'Placeholder 3',
-      texto: 'Puedes agregar más objetos a este arreglo para escalar el carrusel',
-      imageUrl: ''
+      src: 'images/slider3.jpg'
     }
   ]);
 
