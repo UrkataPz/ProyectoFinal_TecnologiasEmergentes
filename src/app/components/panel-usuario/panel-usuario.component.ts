@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { switchMap, of } from 'rxjs';
-import { Storage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 import { Auth, updateProfile } from '@angular/fire/auth';
 import { AuthService } from '../../services/auth.service';
 import { ClubesService } from '../../services/clubes.service';
@@ -27,8 +26,7 @@ type PanelTab = 'solicitudes' | 'clubes' | 'admin-clubes' | 'admin-solicitudes' 
 })
 export class PanelUsuarioComponent {
   readonly authService = inject(AuthService);
-  private storage              = inject(Storage);
-  private auth                 = inject(Auth);
+  private auth         = inject(Auth);
   private clubesService        = inject(ClubesService);
   private solicitudesService   = inject(SolicitudesService);
   private eventosService       = inject(EventosService);
@@ -388,26 +386,15 @@ export class PanelUsuarioComponent {
       this.fotoMensaje.set('❌ Solo se permiten imágenes');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      this.fotoMensaje.set('❌ La imagen no debe superar 2MB');
-      return;
-    }
 
     this.subiendoFoto.set(true);
-    this.fotoMensaje.set('Subiendo...');
+    this.fotoMensaje.set('Procesando...');
     try {
-      const storageRef = ref(this.storage, `profile-photos/${uid}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-
-      await this.userService.updateProfile(uid, { fotoUrl: url });
-
-      const user = this.auth.currentUser;
-      if (user) await updateProfile(user, { photoURL: url });
-
+      const base64 = await imagenABase64(file, 200);
+      await this.userService.updateProfile(uid, { fotoUrl: base64 });
       this.fotoMensaje.set('✅ Foto actualizada');
     } catch {
-      this.fotoMensaje.set('❌ Error al subir la foto');
+      this.fotoMensaje.set('❌ Error al procesar la imagen');
     } finally {
       this.subiendoFoto.set(false);
       input.value = '';
@@ -428,4 +415,22 @@ export class PanelUsuarioComponent {
     };
     return mapa[estado] ?? '';
   }
+}
+
+function imagenABase64(file: File, maxSize: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale  = Math.min(maxSize / img.width, maxSize / img.height, 1);
+      const canvas = document.createElement('canvas');
+      canvas.width  = Math.round(img.width  * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
 }

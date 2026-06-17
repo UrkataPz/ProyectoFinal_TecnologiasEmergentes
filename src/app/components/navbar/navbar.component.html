@@ -71,8 +71,8 @@
 
       @if (isLoggedIn()) {
         <a routerLink="/panel-usuario" routerLinkActive="active" (click)="cerrarMenu()" class="nav-user-link">
-          @if (photoURL()) {
-            <img class="nav-avatar" [src]="photoURL()!" [alt]="displayName()">
+          @if (fotoUrl()) {
+            <img class="nav-avatar" [src]="fotoUrl()!" [alt]="displayName()">
           } @else {
             <span class="nav-initial">{{ (displayName() || 'U')[0].toUpperCase() }}</span>
           }
