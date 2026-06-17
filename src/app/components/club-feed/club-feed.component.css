@@ -199,6 +199,7 @@
 }
 .avatar-sm { width: 36px; height: 36px; font-size: 0.78rem; }
 .avatar-empty { background: var(--border); color: var(--muted); }
+.avatar-foto  { object-fit: cover; display: block; }
 
 .post-meta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
 .post-meta strong { font-size: 0.9rem; color: var(--primary-dark); }

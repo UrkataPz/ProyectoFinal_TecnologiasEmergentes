@@ -5,6 +5,7 @@ export interface Comment {
   autorId: string;
   autorNombre: string;
   autorRolClub?: string | null;
+  autorFotoUrl?: string | null;
   contenido: string;
   creadoEn?: any;
 }

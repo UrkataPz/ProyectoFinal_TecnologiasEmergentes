@@ -138,10 +138,14 @@
               <article class="card post-card" role="article"
                        [attr.aria-label]="'Publicación de ' + post.autorNombre">
                 <div class="post-header">
-                  <div class="avatar" [style.background]="colorAvatar(post.autorNombre)"
-                       aria-hidden="true">
-                    {{ iniciales(post.autorNombre) }}
-                  </div>
+                  @if (post.autorFotoUrl) {
+                    <img class="avatar avatar-foto" [src]="post.autorFotoUrl" [alt]="post.autorNombre" aria-hidden="true">
+                  } @else {
+                    <div class="avatar" [style.background]="colorAvatar(post.autorNombre)"
+                         aria-hidden="true">
+                      {{ iniciales(post.autorNombre) }}
+                    </div>
+                  }
                   <div class="post-meta">
                     <div class="meta-nombre">
                       <strong>{{ post.autorNombre }}</strong>
@@ -196,10 +200,14 @@
                     @for (c of (comentariosAgrupados()[post.id!] ?? []); track c.id) {
                       <div class="comentario-item">
                         <div class="comentario-header">
-                          <div class="avatar avatar-xs" [style.background]="colorAvatar(c.autorNombre)"
-                               aria-hidden="true">
-                            {{ iniciales(c.autorNombre) }}
-                          </div>
+                          @if (c.autorFotoUrl) {
+                            <img class="avatar avatar-xs avatar-foto" [src]="c.autorFotoUrl" [alt]="c.autorNombre" aria-hidden="true">
+                          } @else {
+                            <div class="avatar avatar-xs" [style.background]="colorAvatar(c.autorNombre)"
+                                 aria-hidden="true">
+                              {{ iniciales(c.autorNombre) }}
+                            </div>
+                          }
                           <div class="comentario-meta">
                             <div class="meta-nombre">
                               <strong>{{ c.autorNombre }}</strong>
@@ -274,10 +282,14 @@
             @for (m of miembrosClub(); track m.id) {
               <div class="card miembro-card">
                 <div class="miembro-fila">
-                  <div class="avatar" [style.background]="colorAvatar(m.usuarioNombre)"
-                       aria-hidden="true">
-                    {{ iniciales(m.usuarioNombre) }}
-                  </div>
+                  @if (fotosMiembros()[m.usuarioId]) {
+                    <img class="avatar avatar-foto" [src]="fotosMiembros()[m.usuarioId]" [alt]="m.usuarioNombre" aria-hidden="true">
+                  } @else {
+                    <div class="avatar" [style.background]="colorAvatar(m.usuarioNombre)"
+                         aria-hidden="true">
+                      {{ iniciales(m.usuarioNombre) }}
+                    </div>
+                  }
                   <div class="miembro-info">
                     <strong>{{ m.usuarioNombre }}</strong>
                     <span class="muted-msg">{{ m.usuarioEmail }}</span>
@@ -468,10 +480,14 @@
         @for (item of mesaDirectiva(); track item.rol) {
           <div class="directiva-item">
             @if (item.miembro) {
-              <div class="avatar avatar-sm" [style.background]="colorAvatar(item.miembro.usuarioNombre)"
-                   aria-hidden="true">
-                {{ iniciales(item.miembro.usuarioNombre) }}
-              </div>
+              @if (fotosMiembros()[item.miembro.usuarioId]) {
+                <img class="avatar avatar-sm avatar-foto" [src]="fotosMiembros()[item.miembro.usuarioId]" [alt]="item.miembro.usuarioNombre" aria-hidden="true">
+              } @else {
+                <div class="avatar avatar-sm" [style.background]="colorAvatar(item.miembro.usuarioNombre)"
+                     aria-hidden="true">
+                  {{ iniciales(item.miembro.usuarioNombre) }}
+                </div>
+              }
               <div class="directiva-info">
                 <span class="directiva-rol"><span aria-hidden="true">{{ item.icono }}</span> {{ item.rol }}</span>
                 <strong>{{ item.miembro.usuarioNombre }}</strong>

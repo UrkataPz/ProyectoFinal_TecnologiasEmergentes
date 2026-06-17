@@ -126,16 +126,18 @@ export class PanelUsuarioComponent {
   readonly mostrarFormClub = signal(false);
   readonly editandoId = signal<string | null>(null);
   readonly formClub = signal<Partial<Club>>({
-    nombre: '', categoria: '', descripcion: '', objetivo: '', requisitos: '', activo: true
+    nombre: '', categoria: '', descripcion: '', objetivo: '', requisitos: '', activo: true, imagenUrl: undefined
   });
   readonly mensajePanel = signal('');
-  readonly cargando = signal(false);
+  readonly cargando        = signal(false);
+  readonly subiendoPortada = signal(false);
+  readonly portadaMensaje  = signal('');
 
   readonly categorias = ['Tecnología', 'Negocios', 'Social', 'Cultura', 'Deportes', 'Arte', 'Académico'];
 
   abrirFormNuevo(): void {
     this.editandoId.set(null);
-    this.formClub.set({ nombre: '', categoria: '', descripcion: '', objetivo: '', requisitos: '', activo: true });
+    this.formClub.set({ nombre: '', categoria: '', descripcion: '', objetivo: '', requisitos: '', activo: true, imagenUrl: undefined });
     this.mostrarFormClub.set(true);
   }
 
@@ -170,7 +172,8 @@ export class PanelUsuarioComponent {
         objetivo: f.objetivo!,
         requisitos: f.requisitos!,
         miembros: this.miembrosPorClub()[this.editandoId() ?? ''] ?? 0,
-        activo: f.activo ?? true
+        activo: f.activo ?? true,
+        ...(f.imagenUrl ? { imagenUrl: f.imagenUrl } : {})
       };
 
       if (this.editandoId()) {
@@ -402,6 +405,33 @@ export class PanelUsuarioComponent {
     }
   }
 
+  quitarPortada(): void {
+    this.formClub.update(f => ({ ...f, imagenUrl: undefined }));
+  }
+
+  async onPortadaSeleccionada(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file  = input.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.portadaMensaje.set('❌ Solo se permiten imágenes');
+      return;
+    }
+    this.subiendoPortada.set(true);
+    this.portadaMensaje.set('Procesando...');
+    try {
+      const base64 = await imagenABanner(file);
+      this.formClub.update(f => ({ ...f, imagenUrl: base64 }));
+      this.portadaMensaje.set('✅ Imagen lista');
+    } catch {
+      this.portadaMensaje.set('❌ Error al procesar la imagen');
+    } finally {
+      this.subiendoPortada.set(false);
+      input.value = '';
+      setTimeout(() => this.portadaMensaje.set(''), 3000);
+    }
+  }
+
   async cerrarSesion(): Promise<void> {
     await this.authService.logout();
     this.router.navigate(['/login']);
@@ -429,6 +459,28 @@ function imagenABase64(file: File, maxSize: number): Promise<string> {
       canvas.height = Math.round(img.height * scale);
       canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
       resolve(canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+function imagenABanner(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const targetW = 640;
+      const targetH = 220;
+      const scale   = Math.max(targetW / img.width, targetH / img.height);
+      const scaledW = img.width  * scale;
+      const scaledH = img.height * scale;
+      const canvas  = document.createElement('canvas');
+      canvas.width  = targetW;
+      canvas.height = targetH;
+      canvas.getContext('2d')!.drawImage(img, (targetW - scaledW) / 2, (targetH - scaledH) / 2, scaledW, scaledH);
+      resolve(canvas.toDataURL('image/jpeg', 0.80));
     };
     img.onerror = reject;
     img.src = url;

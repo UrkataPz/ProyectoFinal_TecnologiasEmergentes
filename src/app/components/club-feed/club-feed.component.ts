@@ -1,7 +1,7 @@
 import { Component, inject, input, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { switchMap, of, combineLatest, map } from 'rxjs';
+import { switchMap, of, combineLatest, map, catchError } from 'rxjs';
 import { ClubesService } from '../../services/clubes.service';
 import { EventosService } from '../../services/eventos.service';
 import { PostsService } from '../../services/posts.service';
@@ -94,6 +94,29 @@ export class ClubFeedComponent {
       switchMap(id => id ? this.solicitudesService.getByClub(id) : of([]))
     ),
     { initialValue: [] }
+  );
+
+  readonly fotosMiembros = toSignal(
+    toObservable(this.miembrosClub).pipe(
+      switchMap(miembros => {
+        if (!miembros.length) return of({} as Record<string, string>);
+        return combineLatest(
+          miembros.map(m =>
+            this.userService.getProfile(m.usuarioId).pipe(
+              map(p => ({ uid: m.usuarioId, foto: p?.fotoUrl ?? '' })),
+              catchError(() => of({ uid: m.usuarioId, foto: '' }))
+            )
+          )
+        ).pipe(
+          map(items => {
+            const result: Record<string, string> = {};
+            for (const { uid, foto } of items) { if (foto) result[uid] = foto; }
+            return result;
+          })
+        );
+      })
+    ),
+    { initialValue: {} as Record<string, string> }
   );
 
   readonly uid = this.authService.uid;
@@ -264,6 +287,7 @@ export class ClubFeedComponent {
         autorId:      user.uid,
         autorNombre:  user.displayName ?? user.email ?? '',
         autorRolClub: this.miSolicitud()?.rolClub ?? null,
+        autorFotoUrl: this.perfil()?.fotoUrl ?? null,
         categoria:    this.categoriaNuevo(),
         contenido,
         likes: []
@@ -308,6 +332,7 @@ export class ClubFeedComponent {
         autorId:      user.uid,
         autorNombre:  user.displayName ?? user.email ?? '',
         autorRolClub: this.miSolicitud()?.rolClub ?? null,
+        autorFotoUrl: this.perfil()?.fotoUrl ?? null,
         contenido
       });
       this.setTextoComentario(postId, '');

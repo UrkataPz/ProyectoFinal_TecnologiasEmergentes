@@ -23,8 +23,7 @@
         { "fieldPath": "clubId", "order": "ASCENDING" },
         { "fieldPath": "creadoEn", "order": "DESCENDING" }
       ]
-    }
-  ],
+    },
     {
       "collectionGroup": "comments",
       "queryScope": "COLLECTION",
