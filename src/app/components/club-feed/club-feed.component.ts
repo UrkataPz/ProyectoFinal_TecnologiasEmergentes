@@ -180,6 +180,8 @@ export class ClubFeedComponent {
   readonly nuevoContenido  = signal('');
   readonly categoriaNuevo  = signal<Exclude<Categoria, 'Todos'>>('Anuncios');
   readonly publicando      = signal(false);
+  readonly nuevaImagen     = signal<string | null>(null);
+  readonly subiendoImagen  = signal(false);
 
   readonly postExpandido     = signal<string | null>(null);
   readonly comentariosTexto  = signal<Record<string, string>>({});
@@ -313,6 +315,24 @@ export class ClubFeedComponent {
     await this.postsService.toggleLike(post.id, uid, this.estaLikeado(post));
   }
 
+  async onImagenSeleccionada(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.subiendoImagen.set(true);
+    try {
+      this.nuevaImagen.set(await imagenAPost(file));
+    } finally {
+      this.subiendoImagen.set(false);
+      input.value = '';
+    }
+  }
+
+  quitarImagen(): void {
+    this.nuevaImagen.set(null);
+  }
+
   async publicar(): Promise<void> {
     const user = this.authService.currentUser();
     const club = this.club();
@@ -329,9 +349,11 @@ export class ClubFeedComponent {
         autorFotoUrl: this.perfil()?.fotoUrl ?? null,
         categoria:    this.categoriaNuevo(),
         contenido,
+        imagenUrl:    this.nuevaImagen(),
         likes: []
       });
       this.nuevoContenido.set('');
+      this.nuevaImagen.set(null);
     } finally {
       this.publicando.set(false);
     }
@@ -470,4 +492,25 @@ export class ClubFeedComponent {
 
 function toISO(d: Date): string {
   return d.toISOString().slice(0, 10);
+}
+
+function imagenAPost(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const maxDim = 1000;
+      const scale  = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width  = w;
+      canvas.height = h;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.78));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
 }

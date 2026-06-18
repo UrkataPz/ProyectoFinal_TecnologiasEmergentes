@@ -111,21 +111,59 @@
         </div>
 
         <div class="card composer">
-          <label for="composer-text" class="sr-only">Escribe una nueva publicación</label>
-          <textarea id="composer-text" class="composer-input"
-            placeholder="¿Qué está pasando en el club?"
-            [value]="nuevoContenido()"
-            (input)="nuevoContenido.set($any($event.target).value)"
-            rows="3"></textarea>
-          <div class="composer-footer">
-            <label for="composer-cat" class="sr-only">Categoría de la publicación</label>
-            <select id="composer-cat" class="select-cat" [value]="categoriaNuevo()"
-              (change)="categoriaNuevo.set($any($event.target).value)">
-              @for (cat of categoriasPost; track cat) {
-                <option [value]="cat">{{ cat }}</option>
+          <div class="composer-row">
+            <div class="composer-avatar" aria-hidden="true">
+              @if (perfil()?.fotoUrl) {
+                <img [src]="perfil()!.fotoUrl!" alt="">
+              } @else {
+                <span>{{ iniciales(perfil()?.nombre || '') }}</span>
               }
-            </select>
-            <button type="button" class="btn btn-blue"
+            </div>
+            <div class="composer-main">
+              <label for="composer-text" class="sr-only">Escribe una nueva publicación</label>
+              <textarea id="composer-text" class="composer-input"
+                placeholder="¿Qué está pasando en el club?"
+                [value]="nuevoContenido()"
+                (input)="nuevoContenido.set($any($event.target).value)"
+                rows="2"></textarea>
+
+              @if (subiendoImagen()) {
+                <p class="composer-image-status" role="status">Procesando imagen...</p>
+              }
+
+              @if (nuevaImagen()) {
+                <div class="composer-image-preview">
+                  <img [src]="nuevaImagen()!" alt="Vista previa de la imagen adjunta">
+                  <button type="button" class="composer-image-remove"
+                    (click)="quitarImagen()" aria-label="Quitar imagen adjunta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="composer-toolbar">
+            <div class="composer-tools">
+              <label class="composer-tool-btn" [class.disabled]="subiendoImagen()" aria-label="Adjuntar imagen a la publicación">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                <input type="file" accept="image/*" style="display:none"
+                  [disabled]="subiendoImagen()" (change)="onImagenSeleccionada($event)">
+              </label>
+
+              <div class="composer-cat">
+                <svg class="composer-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.59 2.59 20 10v.01L10.01 20 2.59 12.59A2 2 0 0 1 2 11.17V4a2 2 0 0 1 2-2h7.17a2 2 0 0 1 1.42.59Z"/><circle cx="7" cy="7" r="1"/></svg>
+                <label for="composer-cat" class="sr-only">Categoría de la publicación</label>
+                <select id="composer-cat" class="select-cat" [value]="categoriaNuevo()"
+                  (change)="categoriaNuevo.set($any($event.target).value)">
+                  @for (cat of categoriasPost; track cat) {
+                    <option [value]="cat">{{ cat }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-blue composer-publish"
               (click)="publicar()"
               [disabled]="publicando() || !nuevoContenido().trim()"
               [attr.aria-busy]="publicando() ? 'true' : null">
@@ -179,6 +217,12 @@
                 </div>
 
                 <p class="post-body">{{ post.contenido }}</p>
+
+                @if (post.imagenUrl) {
+                  <div class="post-image">
+                    <img [src]="post.imagenUrl" [alt]="'Imagen adjunta a la publicación de ' + post.autorNombre">
+                  </div>
+                }
 
                 <div class="post-actions">
                   <button type="button" class="like-btn"
