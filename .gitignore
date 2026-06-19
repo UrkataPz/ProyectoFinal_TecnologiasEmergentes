@@ -19,6 +19,3 @@ Thumbs.db
 
 # Firebase local cache
 .firebase/
-
-# Claude Code local settings
-.claude/settings.local.json

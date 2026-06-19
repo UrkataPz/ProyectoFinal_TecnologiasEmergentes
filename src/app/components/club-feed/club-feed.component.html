@@ -467,7 +467,7 @@
                 [class.selected]="diaSeleccionado() === day.iso"
                 [class.today]="esHoy(day.date)"
                 [attr.aria-pressed]="diaSeleccionado() === day.iso"
-                [attr.aria-label]="day.date.toLocaleDateString('es-HN', {weekday:'long', day:'numeric', month:'long'}) + (esHoy(day.date) ? ', hoy' : '') + (day.eventos.length > 0 ? ', ' + day.eventos.length + (day.eventos.length === 1 ? ' evento' : ' eventos') : '')"
+                [attr.aria-label]="day.date.toLocaleDateString('es-HN', {weekday:'long', day:'numeric', month:'long'}) + (day.eventos.length > 0 ? ', ' + day.eventos.length + (day.eventos.length === 1 ? ' evento' : ' eventos') : '')"
                 (click)="seleccionarDia(day.iso)">
                 {{ day.date.getDate() }}
                 @if (day.eventos.length > 0) {
@@ -478,22 +478,6 @@
           </div>
         </div>
 
-        <ng-template #eventoCard let-ev="ev" let-clickable="clickable" let-pasado="pasado">
-          <div class="card evento-item" [class.evento-pasado]="pasado"
-            [attr.role]="clickable ? 'button' : null"
-            [attr.tabindex]="clickable ? 0 : null"
-            [attr.aria-label]="clickable ? ('Ver ' + ev.titulo + ' en el calendario') : null"
-            (click)="clickable && irAFechaEvento(ev.fecha)"
-            (keydown.enter)="clickable && irAFechaEvento(ev.fecha)">
-            <div class="evento-item-header">
-              <strong>{{ ev.titulo }}</strong>
-              <span class="ev-fecha">{{ formatearFechaEvento(ev.fecha, ev.hora) }}</span>
-            </div>
-            <p>{{ ev.descripcion }}</p>
-            <span class="ev-lugar"><svg class="ev-lugar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> {{ ev.lugar }}</span>
-          </div>
-        </ng-template>
-
         @if (diaSeleccionado()) {
           <div class="dia-eventos">
             <p class="section-label">{{ diaSeleccionado() }}</p>
@@ -501,35 +485,39 @@
               <p class="muted-msg" role="status">Sin eventos este día.</p>
             } @else {
               @for (ev of eventosDelDia(); track ev.id) {
-                <ng-container [ngTemplateOutlet]="eventoCard" [ngTemplateOutletContext]="{ ev: ev, clickable: false }"></ng-container>
+                <div class="card evento-item">
+                  <div class="evento-item-header">
+                    <strong>{{ ev.titulo }}</strong>
+                    <span class="ev-fecha">{{ formatearFechaEvento(ev.fecha, ev.hora) }}</span>
+                  </div>
+                  <p>{{ ev.descripcion }}</p>
+                  <span class="ev-lugar"><svg class="ev-lugar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> {{ ev.lugar }}</span>
+                </div>
               }
             }
           </div>
         } @else {
           <div class="eventos-lista">
-            <p class="section-label">Próximos eventos</p>
-            @if (eventosProximos().length === 0) {
-              <p class="muted-msg" role="status">No hay próximos eventos programados.</p>
+            <p class="section-label">Todos los eventos</p>
+            @if (eventos().length === 0) {
+              <p class="muted-msg" role="status">Sin eventos programados.</p>
             } @else {
-              @for (ev of eventosProximos(); track ev.id) {
-                <ng-container [ngTemplateOutlet]="eventoCard" [ngTemplateOutletContext]="{ ev: ev, clickable: true }"></ng-container>
-              }
-            }
-
-            @if (eventosPasados().length > 0) {
-              <button type="button" class="btn btn-light btn-sm toggle-pasados-btn"
-                [attr.aria-expanded]="mostrarPasados()"
-                aria-controls="eventos-pasados-lista"
-                (click)="mostrarPasados.set(!mostrarPasados())">
-                {{ mostrarPasados() ? 'Ocultar' : 'Ver' }} eventos pasados ({{ eventosPasados().length }})
-              </button>
-
-              @if (mostrarPasados()) {
-                <div id="eventos-pasados-lista" class="eventos-lista eventos-pasados">
-                  @for (ev of eventosPasados(); track ev.id) {
-                    <ng-container [ngTemplateOutlet]="eventoCard" [ngTemplateOutletContext]="{ ev: ev, clickable: true, pasado: true }"></ng-container>
-                  }
-                </div>
+              @for (ev of eventos(); track ev.id) {
+                @if (ev.activo) {
+                  <div class="card evento-item"
+                    role="button"
+                    tabindex="0"
+                    [attr.aria-label]="'Ver ' + ev.titulo + ' en el calendario'"
+                    (click)="seleccionarDia(ev.fecha); calYear.set(+ev.fecha.slice(0,4)); calMonth.set(+ev.fecha.slice(5,7) - 1)"
+                    (keydown.enter)="seleccionarDia(ev.fecha); calYear.set(+ev.fecha.slice(0,4)); calMonth.set(+ev.fecha.slice(5,7) - 1)">
+                    <div class="evento-item-header">
+                      <strong>{{ ev.titulo }}</strong>
+                      <span class="ev-fecha">{{ formatearFechaEvento(ev.fecha, ev.hora) }}</span>
+                    </div>
+                    <p>{{ ev.descripcion }}</p>
+                    <span class="ev-lugar"><svg class="ev-lugar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> {{ ev.lugar }}</span>
+                  </div>
+                }
               }
             }
           </div>
