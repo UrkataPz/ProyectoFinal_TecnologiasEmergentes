@@ -656,10 +656,16 @@
 }
 .cal-day:hover { background: var(--secondary); }
 .cal-day.other-month { color: var(--muted); opacity: 0.45; }
-.cal-day.today { font-weight: 700; color: var(--primary); }
+.cal-day.today {
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--secondary);
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
 .cal-day.has-events { font-weight: 600; }
 .cal-day.selected { background: var(--primary); color: #fff; }
 .cal-day.selected .ev-dot { background: #fff; }
+.cal-day.today.selected { box-shadow: none; }
 
 .ev-dot {
   width: 5px; height: 5px;
@@ -675,10 +681,20 @@
 }
 
 .evento-item {
-  cursor: pointer;
-  transition: box-shadow 0.15s;
+  transition: box-shadow 0.15s, opacity 0.15s;
 }
-.evento-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.evento-item[role="button"] { cursor: pointer; }
+.evento-item[role="button"]:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+.evento-item.evento-pasado { opacity: 0.65; }
+
+.toggle-pasados-btn { align-self: flex-start; margin-top: 2px; }
+
+.eventos-pasados {
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
+  margin-top: 4px;
+}
 
 .evento-item-header {
   display: flex;
