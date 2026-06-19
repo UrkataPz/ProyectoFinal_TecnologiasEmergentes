@@ -7,6 +7,7 @@ export interface Post {
   autorFotoUrl?: string | null;
   categoria: 'Anuncios' | 'Eventos' | 'Proyectos' | 'Social';
   contenido: string;
+  imagenUrl?: string | null;
   creadoEn?: any;
   likes: string[];
 }
