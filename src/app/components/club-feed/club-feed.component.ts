@@ -1,4 +1,5 @@
 import { Component, inject, input, signal, computed } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { switchMap, of, combineLatest, map, catchError } from 'rxjs';
@@ -31,7 +32,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-club-feed',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, NgTemplateOutlet],
   templateUrl: './club-feed.component.html',
   styleUrl: './club-feed.component.css'
 })
@@ -219,6 +220,7 @@ export class ClubFeedComponent {
   readonly calYear  = signal(new Date().getFullYear());
   readonly calMonth = signal(new Date().getMonth());
   readonly diaSeleccionado = signal<string | null>(null);
+  readonly mostrarPasados  = signal(false);
 
   readonly mostrarFormEvento = signal(false);
   readonly guardandoEvento   = signal(false);
@@ -260,12 +262,21 @@ export class ClubFeedComponent {
     return this.eventos().filter(e => e.fecha === dia && e.activo);
   });
 
-  readonly proximosEventos = computed(() => {
+  readonly eventosProximos = computed(() => {
     const hoy = toISO(new Date());
     return this.eventos()
       .filter(e => e.activo && e.fecha >= hoy)
-      .slice(0, 3);
+      .sort((a, b) => a.fecha === b.fecha ? a.hora.localeCompare(b.hora) : a.fecha.localeCompare(b.fecha));
   });
+
+  readonly eventosPasados = computed(() => {
+    const hoy = toISO(new Date());
+    return this.eventos()
+      .filter(e => e.activo && e.fecha < hoy)
+      .sort((a, b) => a.fecha === b.fecha ? b.hora.localeCompare(a.hora) : b.fecha.localeCompare(a.fecha));
+  });
+
+  readonly proximosEventos = computed(() => this.eventosProximos().slice(0, 3));
 
   readonly mesaDirectiva = computed(() => {
     const roles: RolClub[] = ['Presidente', 'Vicepresidente', 'Secretario', 'Tesorero'];
@@ -290,6 +301,12 @@ export class ClubFeedComponent {
 
   seleccionarDia(iso: string): void {
     this.diaSeleccionado.set(this.diaSeleccionado() === iso ? null : iso);
+  }
+
+  irAFechaEvento(fecha: string): void {
+    this.diaSeleccionado.set(fecha);
+    this.calYear.set(+fecha.slice(0, 4));
+    this.calMonth.set(+fecha.slice(5, 7) - 1);
   }
 
   esHoy(date: Date): boolean {
