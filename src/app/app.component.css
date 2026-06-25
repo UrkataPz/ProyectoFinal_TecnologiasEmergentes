@@ -21,15 +21,12 @@ main { min-height: calc(100vh - 200px); }
   gap: 12px;
 }
 .footer-logo {
-  display: grid;
-  place-items: center;
   width: 40px;
   height: 40px;
+  padding: 5px;
   border-radius: 10px;
-  background: var(--accent);
-  color: var(--white);
-  font-weight: 900;
-  font-size: 0.85rem;
+  background: var(--white);
+  object-fit: contain;
   flex-shrink: 0;
 }
 .footer-brand strong {

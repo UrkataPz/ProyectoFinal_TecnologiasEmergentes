@@ -17,7 +17,6 @@ export class RegistroComponent {
   nombre = signal('');
   correo = signal('');
   carrera = signal('');
-  rol = signal('Estudiante');
   password = signal('');
   confirmPassword = signal('');
   mensaje = signal('');
@@ -50,7 +49,7 @@ export class RegistroComponent {
         this.password(),
         this.nombre(),
         this.carrera(),
-        this.rol()
+        'Estudiante'
       );
 
       if (result.success) {
