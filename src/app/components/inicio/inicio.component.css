@@ -21,7 +21,6 @@
 }
 
 .carousel-section,
-.search-section,
 .stats,
 .mt {
   margin-top: 2px;
@@ -73,29 +72,12 @@
   }
 }
 
-.search-section {
-  display: grid;
-  gap: 14px;
-}
-
-.search-section h2,
 .stats h2 {
   color: var(--primary-dark);
   font-size: 1.15rem;
   margin-bottom: 4px;
 }
 
-.search-section p {
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
-.search-field {
-  display: grid;
-  gap: 7px;
-}
-
-.search-count,
 .members {
   color: var(--muted);
   font-size: 0.84rem;
@@ -203,11 +185,6 @@
   .carousel-slide,
   .carousel-slide img {
     min-height: 320px;
-  }
-
-  .search-section {
-    grid-template-columns: 0.8fr 1.2fr;
-    align-items: end;
   }
 
   .benefits-grid {

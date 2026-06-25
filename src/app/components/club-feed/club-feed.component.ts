@@ -1,4 +1,5 @@
 import { Component, inject, input, signal, computed } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { switchMap, of, combineLatest, map, catchError } from 'rxjs';
@@ -16,6 +17,11 @@ import { RolClub } from '../../models/solicitud.model';
 type Vista     = 'inicio' | 'miembros' | 'eventos';
 type Categoria = 'Todos' | 'Anuncios' | 'Eventos' | 'Proyectos' | 'Social';
 
+interface PerfilLigero {
+  nombre: string;
+  foto: string;
+}
+
 interface CalendarDay {
   date: Date;
   iso: string;
@@ -26,7 +32,7 @@ interface CalendarDay {
 @Component({
   selector: 'app-club-feed',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, NgTemplateOutlet],
   templateUrl: './club-feed.component.html',
   styleUrl: './club-feed.component.css'
 })
@@ -96,28 +102,52 @@ export class ClubFeedComponent {
     { initialValue: [] }
   );
 
-  readonly fotosMiembros = toSignal(
+  readonly perfilesMiembros = toSignal(
     toObservable(this.miembrosClub).pipe(
-      switchMap(miembros => {
-        if (!miembros.length) return of({} as Record<string, string>);
-        return combineLatest(
-          miembros.map(m =>
-            this.userService.getProfile(m.usuarioId).pipe(
-              map(p => ({ uid: m.usuarioId, foto: p?.fotoUrl ?? '' })),
-              catchError(() => of({ uid: m.usuarioId, foto: '' }))
-            )
-          )
-        ).pipe(
-          map(items => {
-            const result: Record<string, string> = {};
-            for (const { uid, foto } of items) { if (foto) result[uid] = foto; }
-            return result;
-          })
-        );
-      })
+      switchMap(miembros => this.cargarPerfiles(miembros.map(m => m.usuarioId)))
     ),
-    { initialValue: {} as Record<string, string> }
+    { initialValue: {} as Record<string, PerfilLigero> }
   );
+
+  readonly perfilesAutores = toSignal(
+    combineLatest([toObservable(this.posts), toObservable(this.comentarios)]).pipe(
+      map(([posts, comentarios]) => {
+        const ids = new Set<string>();
+        for (const p of posts) ids.add(p.autorId);
+        for (const c of comentarios) ids.add(c.autorId);
+        return Array.from(ids);
+      }),
+      switchMap(ids => this.cargarPerfiles(ids))
+    ),
+    { initialValue: {} as Record<string, PerfilLigero> }
+  );
+
+  readonly miembrosConPerfil = computed(() => {
+    const perfiles = this.perfilesMiembros();
+    return this.miembrosClub().map(m => ({
+      ...m,
+      usuarioNombre: perfiles[m.usuarioId]?.nombre || m.usuarioNombre,
+      fotoUrl: perfiles[m.usuarioId]?.foto || ''
+    }));
+  });
+
+  private cargarPerfiles(ids: string[]) {
+    if (!ids.length) return of({} as Record<string, PerfilLigero>);
+    return combineLatest(
+      ids.map(id =>
+        this.userService.getProfile(id).pipe(
+          map(p => ({ id, nombre: p?.nombre ?? '', foto: p?.fotoUrl ?? '' })),
+          catchError(() => of({ id, nombre: '', foto: '' }))
+        )
+      )
+    ).pipe(
+      map(items => {
+        const result: Record<string, PerfilLigero> = {};
+        for (const { id, nombre, foto } of items) result[id] = { nombre, foto };
+        return result;
+      })
+    );
+  }
 
   readonly uid = this.authService.uid;
 
@@ -151,6 +181,8 @@ export class ClubFeedComponent {
   readonly nuevoContenido  = signal('');
   readonly categoriaNuevo  = signal<Exclude<Categoria, 'Todos'>>('Anuncios');
   readonly publicando      = signal(false);
+  readonly nuevaImagen     = signal<string | null>(null);
+  readonly subiendoImagen  = signal(false);
 
   readonly postExpandido     = signal<string | null>(null);
   readonly comentariosTexto  = signal<Record<string, string>>({});
@@ -158,15 +190,26 @@ export class ClubFeedComponent {
 
   readonly postsFiltrados = computed(() => {
     const cat = this.categoriaActiva();
-    if (cat === 'Todos') return this.posts();
-    return this.posts().filter(p => p.categoria === cat);
+    const perfiles = this.perfilesAutores();
+    const base = cat === 'Todos' ? this.posts() : this.posts().filter(p => p.categoria === cat);
+    return base.map(p => ({
+      ...p,
+      autorNombre: perfiles[p.autorId]?.nombre || p.autorNombre,
+      autorFotoUrl: perfiles[p.autorId]?.foto || p.autorFotoUrl
+    }));
   });
 
   readonly comentariosAgrupados = computed(() => {
+    const perfiles = this.perfilesAutores();
     const agrupado: Record<string, Comment[] | undefined> = {};
     for (const c of this.comentarios()) {
+      const enriquecido = {
+        ...c,
+        autorNombre: perfiles[c.autorId]?.nombre || c.autorNombre,
+        autorFotoUrl: perfiles[c.autorId]?.foto || c.autorFotoUrl
+      };
       if (!agrupado[c.postId]) agrupado[c.postId] = [];
-      agrupado[c.postId]!.push(c);
+      agrupado[c.postId]!.push(enriquecido);
     }
     return agrupado;
   });
@@ -177,6 +220,7 @@ export class ClubFeedComponent {
   readonly calYear  = signal(new Date().getFullYear());
   readonly calMonth = signal(new Date().getMonth());
   readonly diaSeleccionado = signal<string | null>(null);
+  readonly mostrarPasados  = signal(false);
 
   readonly mostrarFormEvento = signal(false);
   readonly guardandoEvento   = signal(false);
@@ -218,19 +262,27 @@ export class ClubFeedComponent {
     return this.eventos().filter(e => e.fecha === dia && e.activo);
   });
 
-  readonly proximosEventos = computed(() => {
+  readonly eventosProximos = computed(() => {
     const hoy = toISO(new Date());
     return this.eventos()
       .filter(e => e.activo && e.fecha >= hoy)
-      .slice(0, 3);
+      .sort((a, b) => a.fecha === b.fecha ? a.hora.localeCompare(b.hora) : a.fecha.localeCompare(b.fecha));
   });
+
+  readonly eventosPasados = computed(() => {
+    const hoy = toISO(new Date());
+    return this.eventos()
+      .filter(e => e.activo && e.fecha < hoy)
+      .sort((a, b) => a.fecha === b.fecha ? b.hora.localeCompare(a.hora) : b.fecha.localeCompare(a.fecha));
+  });
+
+  readonly proximosEventos = computed(() => this.eventosProximos().slice(0, 3));
 
   readonly mesaDirectiva = computed(() => {
     const roles: RolClub[] = ['Presidente', 'Vicepresidente', 'Secretario', 'Tesorero'];
-    const miembros = this.miembrosClub();
+    const miembros = this.miembrosConPerfil();
     return roles.map(rol => ({
       rol,
-      icono: { Presidente: '👑', Vicepresidente: '🛡️', Secretario: '✉️', Tesorero: '💰' }[rol],
       miembro: miembros.find(m => m.rolClub === rol) ?? null
     }));
   });
@@ -249,6 +301,12 @@ export class ClubFeedComponent {
 
   seleccionarDia(iso: string): void {
     this.diaSeleccionado.set(this.diaSeleccionado() === iso ? null : iso);
+  }
+
+  irAFechaEvento(fecha: string): void {
+    this.diaSeleccionado.set(fecha);
+    this.calYear.set(+fecha.slice(0, 4));
+    this.calMonth.set(+fecha.slice(5, 7) - 1);
   }
 
   esHoy(date: Date): boolean {
@@ -274,6 +332,24 @@ export class ClubFeedComponent {
     await this.postsService.toggleLike(post.id, uid, this.estaLikeado(post));
   }
 
+  async onImagenSeleccionada(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.subiendoImagen.set(true);
+    try {
+      this.nuevaImagen.set(await imagenAPost(file));
+    } finally {
+      this.subiendoImagen.set(false);
+      input.value = '';
+    }
+  }
+
+  quitarImagen(): void {
+    this.nuevaImagen.set(null);
+  }
+
   async publicar(): Promise<void> {
     const user = this.authService.currentUser();
     const club = this.club();
@@ -285,14 +361,16 @@ export class ClubFeedComponent {
       await this.postsService.create({
         clubId:       club.id!,
         autorId:      user.uid,
-        autorNombre:  user.displayName ?? user.email ?? '',
+        autorNombre:  this.perfil()?.nombre || user.displayName || user.email || '',
         autorRolClub: this.miSolicitud()?.rolClub ?? null,
         autorFotoUrl: this.perfil()?.fotoUrl ?? null,
         categoria:    this.categoriaNuevo(),
         contenido,
+        imagenUrl:    this.nuevaImagen(),
         likes: []
       });
       this.nuevoContenido.set('');
+      this.nuevaImagen.set(null);
     } finally {
       this.publicando.set(false);
     }
@@ -330,7 +408,7 @@ export class ClubFeedComponent {
         postId,
         clubId:       club.id!,
         autorId:      user.uid,
-        autorNombre:  user.displayName ?? user.email ?? '',
+        autorNombre:  this.perfil()?.nombre || user.displayName || user.email || '',
         autorRolClub: this.miSolicitud()?.rolClub ?? null,
         autorFotoUrl: this.perfil()?.fotoUrl ?? null,
         contenido
@@ -431,4 +509,25 @@ export class ClubFeedComponent {
 
 function toISO(d: Date): string {
   return d.toISOString().slice(0, 10);
+}
+
+function imagenAPost(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const maxDim = 1000;
+      const scale  = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width  = w;
+      canvas.height = h;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.78));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
 }

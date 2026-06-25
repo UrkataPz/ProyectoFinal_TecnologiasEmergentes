@@ -18,19 +18,22 @@
             [class.active]="vistaActiva() === 'inicio'"
             [attr.aria-current]="vistaActiva() === 'inicio' ? 'page' : null"
             (click)="vistaActiva.set('inicio')">
-            <span aria-hidden="true">🏠</span> Inicio
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg>
+            Inicio
           </button>
           <button type="button" class="nav-btn"
             [class.active]="vistaActiva() === 'miembros'"
             [attr.aria-current]="vistaActiva() === 'miembros' ? 'page' : null"
             (click)="vistaActiva.set('miembros')">
-            <span aria-hidden="true">👥</span> Miembros
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Miembros
           </button>
           <button type="button" class="nav-btn"
             [class.active]="vistaActiva() === 'eventos'"
             [attr.aria-current]="vistaActiva() === 'eventos' ? 'page' : null"
             (click)="vistaActiva.set('eventos')">
-            <span aria-hidden="true">📅</span> Eventos
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Eventos
           </button>
         </nav>
 
@@ -77,19 +80,22 @@
           [class.active]="vistaActiva() === 'inicio'"
           [attr.aria-current]="vistaActiva() === 'inicio' ? 'page' : null"
           (click)="vistaActiva.set('inicio')">
-          <span aria-hidden="true">🏠</span> Inicio
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg>
+          Inicio
         </button>
         <button type="button" class="nav-btn"
           [class.active]="vistaActiva() === 'miembros'"
           [attr.aria-current]="vistaActiva() === 'miembros' ? 'page' : null"
           (click)="vistaActiva.set('miembros')">
-          <span aria-hidden="true">👥</span> Miembros
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Miembros
         </button>
         <button type="button" class="nav-btn"
           [class.active]="vistaActiva() === 'eventos'"
           [attr.aria-current]="vistaActiva() === 'eventos' ? 'page' : null"
           (click)="vistaActiva.set('eventos')">
-          <span aria-hidden="true">📅</span> Eventos
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Eventos
         </button>
       </nav>
 
@@ -105,21 +111,59 @@
         </div>
 
         <div class="card composer">
-          <label for="composer-text" class="sr-only">Escribe una nueva publicación</label>
-          <textarea id="composer-text" class="composer-input"
-            placeholder="¿Qué está pasando en el club?"
-            [value]="nuevoContenido()"
-            (input)="nuevoContenido.set($any($event.target).value)"
-            rows="3"></textarea>
-          <div class="composer-footer">
-            <label for="composer-cat" class="sr-only">Categoría de la publicación</label>
-            <select id="composer-cat" class="select-cat" [value]="categoriaNuevo()"
-              (change)="categoriaNuevo.set($any($event.target).value)">
-              @for (cat of categoriasPost; track cat) {
-                <option [value]="cat">{{ cat }}</option>
+          <div class="composer-row">
+            <div class="composer-avatar" aria-hidden="true">
+              @if (perfil()?.fotoUrl) {
+                <img [src]="perfil()!.fotoUrl!" alt="">
+              } @else {
+                <span>{{ iniciales(perfil()?.nombre || '') }}</span>
               }
-            </select>
-            <button type="button" class="btn btn-blue"
+            </div>
+            <div class="composer-main">
+              <label for="composer-text" class="sr-only">Escribe una nueva publicación</label>
+              <textarea id="composer-text" class="composer-input"
+                placeholder="¿Qué está pasando en el club?"
+                [value]="nuevoContenido()"
+                (input)="nuevoContenido.set($any($event.target).value)"
+                rows="2"></textarea>
+
+              @if (subiendoImagen()) {
+                <p class="composer-image-status" role="status">Procesando imagen...</p>
+              }
+
+              @if (nuevaImagen()) {
+                <div class="composer-image-preview">
+                  <img [src]="nuevaImagen()!" alt="Vista previa de la imagen adjunta">
+                  <button type="button" class="composer-image-remove"
+                    (click)="quitarImagen()" aria-label="Quitar imagen adjunta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="composer-toolbar">
+            <div class="composer-tools">
+              <label class="composer-tool-btn" [class.disabled]="subiendoImagen()" aria-label="Adjuntar imagen a la publicación">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                <input type="file" accept="image/*" style="display:none"
+                  [disabled]="subiendoImagen()" (change)="onImagenSeleccionada($event)">
+              </label>
+
+              <div class="composer-cat">
+                <svg class="composer-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.59 2.59 20 10v.01L10.01 20 2.59 12.59A2 2 0 0 1 2 11.17V4a2 2 0 0 1 2-2h7.17a2 2 0 0 1 1.42.59Z"/><circle cx="7" cy="7" r="1"/></svg>
+                <label for="composer-cat" class="sr-only">Categoría de la publicación</label>
+                <select id="composer-cat" class="select-cat" [value]="categoriaNuevo()"
+                  (change)="categoriaNuevo.set($any($event.target).value)">
+                  @for (cat of categoriasPost; track cat) {
+                    <option [value]="cat">{{ cat }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-blue composer-publish"
               (click)="publicar()"
               [disabled]="publicando() || !nuevoContenido().trim()"
               [attr.aria-busy]="publicando() ? 'true' : null">
@@ -174,13 +218,20 @@
 
                 <p class="post-body">{{ post.contenido }}</p>
 
+                @if (post.imagenUrl) {
+                  <div class="post-image">
+                    <img [src]="post.imagenUrl" [alt]="'Imagen adjunta a la publicación de ' + post.autorNombre">
+                  </div>
+                }
+
                 <div class="post-actions">
                   <button type="button" class="like-btn"
                     [class.liked]="estaLikeado(post)"
                     [attr.aria-pressed]="estaLikeado(post)"
                     [attr.aria-label]="(estaLikeado(post) ? 'Quitar me gusta' : 'Me gusta') + ', ' + post.likes.length + ' me gusta' + (post.likes.length !== 1 ? 's' : '')"
                     (click)="toggleLike(post)">
-                    <span aria-hidden="true">♥</span> {{ post.likes.length }}
+                    <svg class="action-icon" viewBox="0 0 24 24" [attr.fill]="estaLikeado(post) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.5-1.5 3-3.5 3-5.5A4.5 4.5 0 0 0 17.5 4c-1.7 0-3.2.9-4 2.3C12.7 4.9 11.2 4 9.5 4A4.5 4.5 0 0 0 5 8.5c0 2 1.5 4 3 5.5l4 4Z"/></svg>
+                    {{ post.likes.length }}
                   </button>
                   <button type="button" class="comment-toggle-btn"
                     [class.active]="postExpandido() === post.id"
@@ -188,7 +239,8 @@
                     [attr.aria-controls]="'comments-' + post.id"
                     [attr.aria-label]="(postExpandido() === post.id ? 'Ocultar comentarios' : 'Ver comentarios') + ', ' + (comentariosAgrupados()[post.id!] ?? []).length + ' comentario' + ((comentariosAgrupados()[post.id!] ?? []).length !== 1 ? 's' : '')"
                     (click)="toggleComentarios(post.id!)">
-                    <span aria-hidden="true">💬</span> {{ (comentariosAgrupados()[post.id!] ?? []).length }}
+                    <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg>
+                    {{ (comentariosAgrupados()[post.id!] ?? []).length }}
                   </button>
                 </div>
 
@@ -261,11 +313,11 @@
         <div class="vista-header">
           <h2>Miembros del club</h2>
           <span class="muted-msg" aria-live="polite">
-            {{ miembrosClub().length }} miembro{{ miembrosClub().length !== 1 ? 's' : '' }}
+            {{ miembrosConPerfil().length }} miembro{{ miembrosConPerfil().length !== 1 ? 's' : '' }}
           </span>
         </div>
 
-        @if (miembrosClub().length === 0) {
+        @if (miembrosConPerfil().length === 0) {
           <div class="card empty-state" role="status">
             <p class="muted-msg">Ningún miembro aprobado en este club todavía.</p>
             @if (esModerador()) {
@@ -279,11 +331,11 @@
           </div>
         } @else {
           <div class="miembros-list">
-            @for (m of miembrosClub(); track m.id) {
+            @for (m of miembrosConPerfil(); track m.id) {
               <div class="card miembro-card">
                 <div class="miembro-fila">
-                  @if (fotosMiembros()[m.usuarioId]) {
-                    <img class="avatar avatar-foto" [src]="fotosMiembros()[m.usuarioId]" [alt]="m.usuarioNombre" aria-hidden="true">
+                  @if (m.fotoUrl) {
+                    <img class="avatar avatar-foto" [src]="m.fotoUrl" [alt]="m.usuarioNombre" aria-hidden="true">
                   } @else {
                     <div class="avatar" [style.background]="colorAvatar(m.usuarioNombre)"
                          aria-hidden="true">
@@ -415,7 +467,7 @@
                 [class.selected]="diaSeleccionado() === day.iso"
                 [class.today]="esHoy(day.date)"
                 [attr.aria-pressed]="diaSeleccionado() === day.iso"
-                [attr.aria-label]="day.date.toLocaleDateString('es-HN', {weekday:'long', day:'numeric', month:'long'}) + (day.eventos.length > 0 ? ', ' + day.eventos.length + (day.eventos.length === 1 ? ' evento' : ' eventos') : '')"
+                [attr.aria-label]="day.date.toLocaleDateString('es-HN', {weekday:'long', day:'numeric', month:'long'}) + (esHoy(day.date) ? ', hoy' : '') + (day.eventos.length > 0 ? ', ' + day.eventos.length + (day.eventos.length === 1 ? ' evento' : ' eventos') : '')"
                 (click)="seleccionarDia(day.iso)">
                 {{ day.date.getDate() }}
                 @if (day.eventos.length > 0) {
@@ -426,6 +478,22 @@
           </div>
         </div>
 
+        <ng-template #eventoCard let-ev="ev" let-clickable="clickable" let-pasado="pasado">
+          <div class="card evento-item" [class.evento-pasado]="pasado"
+            [attr.role]="clickable ? 'button' : null"
+            [attr.tabindex]="clickable ? 0 : null"
+            [attr.aria-label]="clickable ? ('Ver ' + ev.titulo + ' en el calendario') : null"
+            (click)="clickable && irAFechaEvento(ev.fecha)"
+            (keydown.enter)="clickable && irAFechaEvento(ev.fecha)">
+            <div class="evento-item-header">
+              <strong>{{ ev.titulo }}</strong>
+              <span class="ev-fecha">{{ formatearFechaEvento(ev.fecha, ev.hora) }}</span>
+            </div>
+            <p>{{ ev.descripcion }}</p>
+            <span class="ev-lugar"><svg class="ev-lugar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> {{ ev.lugar }}</span>
+          </div>
+        </ng-template>
+
         @if (diaSeleccionado()) {
           <div class="dia-eventos">
             <p class="section-label">{{ diaSeleccionado() }}</p>
@@ -433,39 +501,35 @@
               <p class="muted-msg" role="status">Sin eventos este día.</p>
             } @else {
               @for (ev of eventosDelDia(); track ev.id) {
-                <div class="card evento-item">
-                  <div class="evento-item-header">
-                    <strong>{{ ev.titulo }}</strong>
-                    <span class="ev-fecha">{{ formatearFechaEvento(ev.fecha, ev.hora) }}</span>
-                  </div>
-                  <p>{{ ev.descripcion }}</p>
-                  <span class="ev-lugar"><span aria-hidden="true">📍</span> {{ ev.lugar }}</span>
-                </div>
+                <ng-container [ngTemplateOutlet]="eventoCard" [ngTemplateOutletContext]="{ ev: ev, clickable: false }"></ng-container>
               }
             }
           </div>
         } @else {
           <div class="eventos-lista">
-            <p class="section-label">Todos los eventos</p>
-            @if (eventos().length === 0) {
-              <p class="muted-msg" role="status">Sin eventos programados.</p>
+            <p class="section-label">Próximos eventos</p>
+            @if (eventosProximos().length === 0) {
+              <p class="muted-msg" role="status">No hay próximos eventos programados.</p>
             } @else {
-              @for (ev of eventos(); track ev.id) {
-                @if (ev.activo) {
-                  <div class="card evento-item"
-                    role="button"
-                    tabindex="0"
-                    [attr.aria-label]="'Ver ' + ev.titulo + ' en el calendario'"
-                    (click)="seleccionarDia(ev.fecha); calYear.set(+ev.fecha.slice(0,4)); calMonth.set(+ev.fecha.slice(5,7) - 1)"
-                    (keydown.enter)="seleccionarDia(ev.fecha); calYear.set(+ev.fecha.slice(0,4)); calMonth.set(+ev.fecha.slice(5,7) - 1)">
-                    <div class="evento-item-header">
-                      <strong>{{ ev.titulo }}</strong>
-                      <span class="ev-fecha">{{ formatearFechaEvento(ev.fecha, ev.hora) }}</span>
-                    </div>
-                    <p>{{ ev.descripcion }}</p>
-                    <span class="ev-lugar"><span aria-hidden="true">📍</span> {{ ev.lugar }}</span>
-                  </div>
-                }
+              @for (ev of eventosProximos(); track ev.id) {
+                <ng-container [ngTemplateOutlet]="eventoCard" [ngTemplateOutletContext]="{ ev: ev, clickable: true }"></ng-container>
+              }
+            }
+
+            @if (eventosPasados().length > 0) {
+              <button type="button" class="btn btn-light btn-sm toggle-pasados-btn"
+                [attr.aria-expanded]="mostrarPasados()"
+                aria-controls="eventos-pasados-lista"
+                (click)="mostrarPasados.set(!mostrarPasados())">
+                {{ mostrarPasados() ? 'Ocultar' : 'Ver' }} eventos pasados ({{ eventosPasados().length }})
+              </button>
+
+              @if (mostrarPasados()) {
+                <div id="eventos-pasados-lista" class="eventos-lista eventos-pasados">
+                  @for (ev of eventosPasados(); track ev.id) {
+                    <ng-container [ngTemplateOutlet]="eventoCard" [ngTemplateOutletContext]="{ ev: ev, clickable: true, pasado: true }"></ng-container>
+                  }
+                </div>
               }
             }
           </div>
@@ -480,8 +544,8 @@
         @for (item of mesaDirectiva(); track item.rol) {
           <div class="directiva-item">
             @if (item.miembro) {
-              @if (fotosMiembros()[item.miembro.usuarioId]) {
-                <img class="avatar avatar-sm avatar-foto" [src]="fotosMiembros()[item.miembro.usuarioId]" [alt]="item.miembro.usuarioNombre" aria-hidden="true">
+              @if (item.miembro.fotoUrl) {
+                <img class="avatar avatar-sm avatar-foto" [src]="item.miembro.fotoUrl" [alt]="item.miembro.usuarioNombre" aria-hidden="true">
               } @else {
                 <div class="avatar avatar-sm" [style.background]="colorAvatar(item.miembro.usuarioNombre)"
                      aria-hidden="true">
@@ -489,13 +553,45 @@
                 </div>
               }
               <div class="directiva-info">
-                <span class="directiva-rol"><span aria-hidden="true">{{ item.icono }}</span> {{ item.rol }}</span>
+                <span class="directiva-rol">
+                  @switch (item.rol) {
+                    @case ('Presidente') {
+                      <svg class="rol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1Z"/></svg>
+                    }
+                    @case ('Vicepresidente') {
+                      <svg class="rol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+                    }
+                    @case ('Secretario') {
+                      <svg class="rol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                    }
+                    @case ('Tesorero') {
+                      <svg class="rol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5a2.5 2.5 0 0 1 2.5-1c1.4 0 2.5.7 2.5 2s-1.1 2-2.5 2-2.5.7-2.5 2 1.1 2 2.5 2a2.5 2.5 0 0 0 2.5-1"/></svg>
+                    }
+                  }
+                  {{ item.rol }}
+                </span>
                 <strong>{{ item.miembro.usuarioNombre }}</strong>
               </div>
             } @else {
               <div class="avatar avatar-sm avatar-empty" aria-hidden="true">?</div>
               <div class="directiva-info">
-                <span class="directiva-rol"><span aria-hidden="true">{{ item.icono }}</span> {{ item.rol }}</span>
+                <span class="directiva-rol">
+                  @switch (item.rol) {
+                    @case ('Presidente') {
+                      <svg class="rol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1Z"/></svg>
+                    }
+                    @case ('Vicepresidente') {
+                      <svg class="rol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+                    }
+                    @case ('Secretario') {
+                      <svg class="rol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                    }
+                    @case ('Tesorero') {
+                      <svg class="rol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5a2.5 2.5 0 0 1 2.5-1c1.4 0 2.5.7 2.5 2s-1.1 2-2.5 2-2.5.7-2.5 2 1.1 2 2.5 2a2.5 2.5 0 0 0 2.5-1"/></svg>
+                    }
+                  }
+                  {{ item.rol }}
+                </span>
                 <span class="muted-msg">Sin asignar</span>
               </div>
             }

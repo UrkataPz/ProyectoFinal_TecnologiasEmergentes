@@ -104,7 +104,7 @@ export class DetalleClubComponent {
     try {
       await this.solicitudesService.create({
         usuarioId:     user.uid,
-        usuarioNombre: user.displayName ?? user.email ?? '',
+        usuarioNombre: this.perfil()?.nombre || user.displayName || user.email || '',
         usuarioEmail:  user.email ?? '',
         clubId:        club.id!,
         clubNombre:    club.nombre,

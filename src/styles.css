@@ -90,14 +90,31 @@ textarea:focus-visible {
 }
 .hero p { line-height: 1.75; color: rgba(255,255,255,0.88); font-size: 0.95rem; }
 
-.hero-card {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: var(--radius);
-  padding: 20px;
+.hero-mascot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
 }
-.hero-card strong { display: block; font-size: 1.5rem; margin-bottom: 6px; color: var(--gold); }
-.hero-card p { color: rgba(255,255,255,0.82); font-size: 0.9rem; }
+.hero-mascot::before {
+  content: '';
+  position: absolute;
+  width: 75%;
+  height: 75%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 72%);
+  border-radius: 50%;
+}
+.hero-mascot img {
+  position: relative;
+  width: 100%;
+  max-width: 200px;
+  max-height: 220px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.35));
+}
 
 @media (min-width: 768px) {
   .hero {
@@ -107,7 +124,7 @@ textarea:focus-visible {
     padding: 40px;
     gap: 28px;
   }
-  .hero-card strong { font-size: 2rem; }
+  .hero-mascot img { max-width: 230px; max-height: 260px; }
 }
 @media (min-width: 1024px) {
   .hero { padding: 48px; }

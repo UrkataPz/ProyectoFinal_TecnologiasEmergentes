@@ -31,17 +31,13 @@
   text-decoration: none;
 }
 .brand-icon {
-  display: grid;
-  place-items: center;
   width: 42px;
   height: 42px;
+  padding: 5px;
   border-radius: 10px;
   background: var(--white);
-  color: var(--primary-dark);
-  font-weight: 900;
-  font-size: 0.85rem;
+  object-fit: contain;
   flex-shrink: 0;
-  letter-spacing: -0.5px;
 }
 .brand-text strong {
   display: block;
